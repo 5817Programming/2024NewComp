@@ -62,14 +62,7 @@ public class Constants {
                                                             // Rejection to Initialize X_Hat
 
     // Sets the motor on a 2Dplane
-    public static final Translation2d[] modulePositions = new Translation2d[] {
-            new Translation2d(mRobotBaseWidth / 2, mRobotBaseLength / 2),
-            new Translation2d(mRobotBaseWidth / 2, -mRobotBaseLength / 2),
-            new Translation2d(-mRobotBaseWidth / 2, mRobotBaseLength / 2),
-            new Translation2d(-mRobotBaseWidth / 2, -mRobotBaseLength / 2),
-
-    };
-    // The positions of the modules, relative to the robot's center
+   // The positions of the modules, relative to the robot's center
     public static final Translation2d kFrontRightPosition = new Translation2d(kRobotBaseWidth / 2,
             -kRobotBaseLength / 2);
     public static final Translation2d kFrontLeftPosition = new Translation2d(kRobotBaseWidth / 2,
@@ -87,6 +80,13 @@ public class Constants {
     public static final Translation2d mRearRightPosition = new Translation2d(-mRobotBaseWidth / 2,
             mRobotBaseLength / 2);
 
+    public static final Translation2d[] mModulePositions = new Translation2d[] {
+        mFrontRightPosition,
+        mFrontLeftPosition,
+        mRearLeftPosition,
+        mRearRightPosition
+    };
+ 
     public static final List<Translation2d> kModulePositions = Arrays.asList(kFrontRightPosition, kFrontLeftPosition,
             kRearLeftPosition, kRearRightPosition);
 

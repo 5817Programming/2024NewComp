@@ -193,10 +193,7 @@ public class SwerveDrive extends Subsystem {
         if (DriverStation.getAlliance().get().equals(Alliance.Blue))
             translationVector = translationVector.inverse();
         rotationScalar *= 0.025;
-        if (translationVector.norm() <= translationDeadband && Math.abs(rotation) <= rotationDeadband) {
-            this.commandModuleDrivePowers(0);
-        }
-
+   
     }
 
     public void setAlignment(Pose2d pose) {
