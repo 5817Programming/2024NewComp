@@ -16,6 +16,8 @@ import com.uni.frc.Constants.ShooterConstants;
 import com.uni.frc.Planners.DriveMotionPlanner;
 import com.uni.frc.Planners.ShootingUtils;
 import com.uni.frc.Planners.ShootingUtils.ShootingParameters;
+import com.uni.frc.loops.ILooper;
+import com.uni.frc.loops.Loop;
 import com.uni.frc.subsystems.Lights.Color;
 import com.uni.frc.subsystems.Requests.Request;
 import com.uni.frc.subsystems.Requests.RequestList;
@@ -228,7 +230,8 @@ public class SuperStructure extends Subsystem {
                         if (modeChanged || stateChanged) {
                             overrideAmpState();
                         }
-                        mIndexer.setPiece(false);;
+                        mIndexer.setPiece(false);
+                        ;
                 }
 
                 break;
@@ -252,32 +255,31 @@ public class SuperStructure extends Subsystem {
                     clearQueues();
                 if (mIndexer.hasPiece())
                     mLights.setColor(Color.HASPIECE);
-                else if (mDrive.isStatusOK()&&currentMode!=Mode.AMP)
+                else if (mDrive.isStatusOK() && currentMode != Mode.AMP)
                     mLights.setColor(Color.IDLE);
-                else if(currentMode == Mode.AMP)
+                else if (currentMode == Mode.AMP)
                     mLights.setColor(Color.AMP);
                 else
                     mLights.setColor(Color.ERROR);
                 mDrive.setState(SwerveDrive.State.MANUAL);
                 mIntake.conformToState(Intake.State.OFF);
                 mIndexer.conformToState(Indexer.State.OFF);
-                if(currentMode == Mode.SHOOTING || currentMode == Mode.FIRING){
-                    if(inShootZone(timestamp) && mIndexer.hasPiece()){
+                if (currentMode == Mode.SHOOTING || currentMode == Mode.FIRING) {
+                    if (inShootZone(timestamp) && mIndexer.hasPiece()) {
                         ShootingParameters shootingParameters = getShootingParams(mRobotState.getKalmanPose(timestamp));
                         mShooter.conformToState(Shooter.State.PARTIALRAMP);
                         mPivot.conformToState(shootingParameters.compensatedDesiredPivotAngle);
-                    }
-                    else{
+                    } else {
                         mPivot.conformToState(Pivot.State.INTAKING);
                         mShooter.conformToState(Shooter.State.IDLE);
                     }
                     mArm.conformToState(Arm.State.MAXDOWN);
-                }else{
-                    if(inAmpZone(timestamp) && mIndexer.hasPiece()){
+                } else {
+                    if (inAmpZone(timestamp) && mIndexer.hasPiece()) {
                         mArm.conformToState(Arm.State.PARTIAL);
-                    }else
+                    } else
                         mArm.conformToState(Arm.State.MAXDOWN);
-                    if(inShootZone(timestamp))
+                    if (inShootZone(timestamp))
                         mPivot.conformToState(Pivot.State.AMP);
                     else
                         mPivot.conformToState(Pivot.State.INTAKING);
@@ -327,78 +329,91 @@ public class SuperStructure extends Subsystem {
             pieceAim = true;
     }
 
-    public void update() {
-        double timeStamp = Timer.getFPGATimestamp();
-        synchronized (SuperStructure.this) {
-
-            if (!activeRequestsComplete) {
-                if (newRequests) {
-                    if (activeRequests.isParallel()) {
-                        boolean allActivated = true;
-                        for (Iterator<Request> iterator = activeRequests.getRequests().iterator(); iterator
-                                .hasNext();) {
-                            Request request = iterator.next();
-                            boolean allowed = request.allowed();
-                            allActivated &= allowed;
-                            if (allowed)
-                                request.act();
-                        }
-                        newRequests = !allActivated;
-                    } else {
-                        if (activeRequests.isEmpty()) {
-                            activeRequestsComplete = true;
-                            return;
-                        }
-                        currentRequest = activeRequests.remove();
-                        currentRequest.act();
-                        currentRequest.initialize();
-                        newRequests = false;
-                    }
-                }
-                if (activeRequests.isParallel()) {
-                    boolean done = true;
-                    for (Request request : activeRequests.getRequests()) {
-                        done &= request.isFinished();
-                    }
-                    activeRequestsComplete = done;
-                } else if (currentRequest.isFinished()) {
-                    if (activeRequests.isEmpty()) {
-                        activeRequestsComplete = true;
-                    } else if (activeRequests.getRequests().get(0).allowed()) {
-                        newRequests = true;
-                        activeRequestsComplete = false;
-                    }
-                } else {
-                    currentRequest.act();
-                }
-            } else {
-                if (!queuedRequests.isEmpty()) {
-                    setActiveRequests(queuedRequests.remove(0));
-                }
+    public void registerEnabledLoops(ILooper mEnabledLooper) {
+        mEnabledLooper.register(new Loop() {
+            @Override
+            public void onStart(double timestamp) {
             }
 
-        }
-        processState(timeStamp);
+            @Override
+            public void onLoop(double timestamp) {
+                double timeStamp = Timer.getFPGATimestamp();
+                synchronized (SuperStructure.this) {
+
+                    if (!activeRequestsComplete) {
+                        if (newRequests) {
+                            if (activeRequests.isParallel()) {
+                                boolean allActivated = true;
+                                for (Iterator<Request> iterator = activeRequests.getRequests().iterator(); iterator
+                                        .hasNext();) {
+                                    Request request = iterator.next();
+                                    boolean allowed = request.allowed();
+                                    allActivated &= allowed;
+                                    if (allowed)
+                                        request.act();
+                                }
+                                newRequests = !allActivated;
+                            } else {
+                                if (activeRequests.isEmpty()) {
+                                    activeRequestsComplete = true;
+                                    return;
+                                }
+                                currentRequest = activeRequests.remove();
+                                currentRequest.act();
+                                currentRequest.initialize();
+                                newRequests = false;
+                            }
+                        }
+                        if (activeRequests.isParallel()) {
+                            boolean done = true;
+                            for (Request request : activeRequests.getRequests()) {
+                                done &= request.isFinished();
+                            }
+                            activeRequestsComplete = done;
+                        } else if (currentRequest.isFinished()) {
+                            if (activeRequests.isEmpty()) {
+                                activeRequestsComplete = true;
+                            } else if (activeRequests.getRequests().get(0).allowed()) {
+                                newRequests = true;
+                                activeRequestsComplete = false;
+                            }
+                        } else {
+                            currentRequest.act();
+                        }
+                    } else {
+                        if (!queuedRequests.isEmpty()) {
+                            setActiveRequests(queuedRequests.remove(0));
+                        }
+                    }
+
+                }
+                processState(timeStamp);
+
+            }
+
+            @Override
+            public void onStop(double timestamp) {
+            }
+        });
     }
 
     public void prepareShooterSetpoints(double timestamp) {
         ShootingParameters shootingParameters = getShootingParams(mRobotState.getKalmanPose(timestamp));
         Logger.recordOutput("Desired Pivot Angle", shootingParameters.compensatedDesiredPivotAngle);
         mShooter.conformToState(Shooter.State.SHOOTING);
-        mPivot.conformToState(shootingParameters.compensatedDesiredPivotAngle-1);
+        mPivot.conformToState(shootingParameters.compensatedDesiredPivotAngle - 1);
         mShooter.setSpin(Constants.ShooterConstants.SPIN);
     }
 
     public void prepareShooterSetpoints(double timestamp, boolean manual) {
         ShootingParameters shootingParameters = getShootingParams(mRobotState.getKalmanPose(timestamp), manual,
                 !inShootZone(timestamp));
-        if(inShootZone(timestamp)){
-        mShooter.conformToState(Shooter.State.SHOOTING);
-        mShooter.setSpin(ShooterConstants.SPIN);
-        }
-        else{
-        mShooter.setPercent(shootingParameters.compensatedDesiredShooterSpeed);
-        mShooter.setSpin(1);
+        if (inShootZone(timestamp)) {
+            mShooter.conformToState(Shooter.State.SHOOTING);
+            mShooter.setSpin(ShooterConstants.SPIN);
+        } else {
+            mShooter.setPercent(shootingParameters.compensatedDesiredShooterSpeed);
+            mShooter.setSpin(1);
         }
         mPivot.conformToState(shootingParameters.compensatedDesiredPivotAngle);
         mIndexer.setPiece(false);
@@ -466,7 +481,6 @@ public class SuperStructure extends Subsystem {
                 false);// TODO change to measured when it works
         return shootingParameters;
     }
-
 
     public ShootingParameters getShootingParams(Pose2d currentPose, boolean manual, boolean lob) {
         InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> shotTimeMap = Constants.ShooterConstants.SHOT_TRAVEL_TIME_TREE_MAP;
@@ -565,41 +579,42 @@ public class SuperStructure extends Subsystem {
 
     public void intakeState(double timeout) {
         RequestList request = new RequestList(Arrays.asList(
-                    logCurrentRequest("Intaking"),
-                    mDrive.setModeRequest(TrajectoryMode.TRACKING),
-                    mLights.setColorRequest(Color.INTAKING),
-                    mIntake.stateRequest(Intake.State.INTAKING),
-                    mIndexer.stateRequest(Indexer.State.RECIEVING),
-                    mIndexer.hasPieceRequest(timeout),
-                    mDrive.setModeRequest(TrajectoryMode.FOLLOWING),
-                    mLights.setColorRequest(Color.INTAKED),
-                    mIndexer.stateRequest(Indexer.State.OFF),
-                    mIntake.stateRequest(Intake.State.OFF),
-                    mIndexer.setHasPieceRequest(true))
-                    , false);
+                logCurrentRequest("Intaking"),
+                mDrive.setModeRequest(TrajectoryMode.TRACKING),
+                mLights.setColorRequest(Color.INTAKING),
+                mIntake.stateRequest(Intake.State.INTAKING),
+                mIndexer.stateRequest(Indexer.State.RECIEVING),
+                mIndexer.hasPieceRequest(timeout),
+                mDrive.setModeRequest(TrajectoryMode.FOLLOWING),
+                mLights.setColorRequest(Color.INTAKED),
+                mIndexer.stateRequest(Indexer.State.OFF),
+                mIntake.stateRequest(Intake.State.OFF),
+                mIndexer.setHasPieceRequest(true)), false);
         queue(request);
 
     }
+
     public void intakeShootState(double timeout) {
         RequestList request;
         request = new RequestList(Arrays.asList(
-                    logCurrentRequest("Intaking"),
-                    mDrive.setModeRequest(TrajectoryMode.TRACKING),
-                    mIndexer.setHasPieceRequest(true),
-                    mLights.setColorRequest(Color.INTAKING),
-                    mIntake.stateRequest(Intake.State.INTAKING),
-                    mIndexer.stateRequest(-1),
-                    waitRequest(timeout),
-                    mLights.setColorRequest(Color.SHOOTING),
-                    mIndexer.stateRequest(Indexer.State.OFF),
-                    mIntake.stateRequest(Intake.State.OFF),
-                    mIndexer.setHasPieceRequest(false))
-                    , false);
+                logCurrentRequest("Intaking"),
+                mDrive.setModeRequest(TrajectoryMode.TRACKING),
+                mIndexer.setHasPieceRequest(true),
+                mLights.setColorRequest(Color.INTAKING),
+                mIntake.stateRequest(Intake.State.INTAKING),
+                mIndexer.stateRequest(-1),
+                waitRequest(timeout),
+                mLights.setColorRequest(Color.SHOOTING),
+                mIndexer.stateRequest(Indexer.State.OFF),
+                mIntake.stateRequest(Intake.State.OFF),
+                mIndexer.setHasPieceRequest(false)), false);
         queue(request);
     }
-        public void shooterPercentState(double percent) {
+
+    public void shooterPercentState(double percent) {
         queue(mShooter.setPercentRequest(percent));
     }
+
     public void waitForEventState(double timestamp) {
         queue(mDriveMotionPlanner.waitForTrajectoryRequest(timestamp));
     }
@@ -692,6 +707,7 @@ public class SuperStructure extends Subsystem {
         request(request);
 
     }
+
     public void overrideAmpState() {
         RequestList request = new RequestList(Arrays.asList(
                 mPivot.stateRequest(Pivot.State.AMP),
@@ -704,6 +720,7 @@ public class SuperStructure extends Subsystem {
         request(request);
 
     }
+
     public void offsetPivot(double offset) {
         pivotOffset += offset;
         Logger.recordOutput("Pivot Offset", pivotOffset);

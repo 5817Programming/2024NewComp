@@ -113,11 +113,7 @@ import com.uni.lib.TalonConfigs;
    }
 
 
-   @Override
-   public void update() {
 
-
-   }
    public void setSpin(double spinMultiplier){
     this.spinMultiplier = spinMultiplier;
    }

@@ -16,6 +16,8 @@ import org.opencv.core.Mat;
 import com.uni.frc.Constants;
 import com.uni.frc.Field.AprilTag;
 import com.uni.frc.Field.FieldLayout;
+import com.uni.frc.loops.ILooper;
+import com.uni.frc.loops.Loop;
 import com.uni.frc.subsystems.RobotState;
 import com.uni.frc.subsystems.Subsystem;
 import com.uni.frc.subsystems.Requests.Request;
@@ -295,12 +297,21 @@ public class OdometryLimeLight extends Subsystem {
       table.getEntry("pipeline").setNumber(mPeriodicIO.pipeline);
     }
   }
-
-  @Override
-  public void update() {
-    readInputsAndAddVisionUpdate();
+  public void registerEnabledLoops(ILooper mEnabledLooper) {
+    mEnabledLooper.register(new Loop() {
+      @Override
+      public void onStart(double timestamp) {
+      }
+      @Override
+      public void onLoop(double timestamp) {
+        readInputsAndAddVisionUpdate();
+      }
+      @Override
+      public void onStop(double timestamp) {
+      }
+    });
   }
-
+  
   @Override
   public void outputTelemetry() {
   }

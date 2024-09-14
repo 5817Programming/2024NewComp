@@ -9,6 +9,8 @@ import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
 import com.uni.frc.Constants;
+import com.uni.frc.loops.ILooper;
+import com.uni.frc.loops.Loop;
 import com.uni.frc.subsystems.Subsystem;
 import com.uni.frc.subsystems.Requests.Request;
 import com.uni.lib.geometry.Translation2d;
@@ -112,11 +114,20 @@ public class ObjectLimeLight extends Subsystem {
     }
   }
 
-  @Override
-  public void update() {
-    readInputsAndAddVisionUpdate();
+  public void registerEnabledLoops(ILooper mEnabledLooper) {
+    mEnabledLooper.register(new Loop() {
+      @Override
+      public void onStart(double timestamp) {
+      }
+      @Override
+      public void onLoop(double timestamp) {
+        readInputsAndAddVisionUpdate();
+      }
+      @Override
+      public void onStop(double timestamp) {
+      }
+    });
   }
-
   @Override
   public void outputTelemetry() {
   }

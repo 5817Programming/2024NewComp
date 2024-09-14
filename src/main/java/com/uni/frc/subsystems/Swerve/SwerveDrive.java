@@ -4,7 +4,6 @@
 
 package com.uni.frc.subsystems.Swerve;
 
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,6 +17,8 @@ import com.uni.frc.Planners.AutoAlignMotionPlanner;
 import com.uni.frc.Planners.DriveMotionPlanner;
 import com.uni.frc.Planners.TargetPiecePlanner;
 import com.uni.frc.Planners.AimingPlanner.AimingRequest;
+import com.uni.frc.loops.ILooper;
+import com.uni.frc.loops.Loop;
 import com.uni.frc.subsystems.RobotState;
 import com.uni.frc.subsystems.Subsystem;
 import com.uni.frc.subsystems.Requests.Request;
@@ -57,14 +58,13 @@ public class SwerveDrive extends Subsystem {
     double speedPercent = 1;
     double rotationalVel;
 
-
     Pigeon gyro;
     OdometryLimeLight odometryVision;
     ObjectLimeLight objectVision;
     Pose2d drivingPose;
 
     Pose2d poseMeters = new Pose2d();
-    
+
     List<SwerveDriveModule> positionModules;
     Translation2d currentVelocity = new Translation2d();
 
@@ -78,8 +78,6 @@ public class SwerveDrive extends Subsystem {
 
     double lastUpdateTimestamp = 0;
 
-
-
     SwerveKinematics inverseKinematics = new SwerveKinematics();
     AutoAlignMotionPlanner mAutoAlignMotionPlanner;
     DriveMotionPlanner mDriveMotionPlanner;
@@ -88,14 +86,12 @@ public class SwerveDrive extends Subsystem {
     RobotState robotState;
     HeadingController headingController = new HeadingController();
 
-
     double currentSpeed = 0;
     double bestDistance;
     boolean lob = false;
     boolean stateHasChanged = false;
     boolean modeHasChanged = false;
     double lastTimeStamp = 0;
-
 
     public SwerveDrive() {
 
@@ -125,7 +121,7 @@ public class SwerveDrive extends Subsystem {
         odometryVision = OdometryLimeLight.getInstance();
         objectVision = ObjectLimeLight.getInstance();
         robotState = RobotState.getInstance();
-        mDriveMotionPlanner =  DriveMotionPlanner.getInstance();
+        mDriveMotionPlanner = DriveMotionPlanner.getInstance();
         mAutoAlignMotionPlanner = new AutoAlignMotionPlanner();
         mAimingPlanner = new AimingPlanner();
         mTargetPiecePlanner = new TargetPiecePlanner();
@@ -142,7 +138,7 @@ public class SwerveDrive extends Subsystem {
         SNAP,
     }
 
-    public enum TrajectoryMode{
+    public enum TrajectoryMode {
         TRACKING,
         FOLLOWING,
     }
@@ -155,21 +151,22 @@ public class SwerveDrive extends Subsystem {
     }
 
     public void setState(State desiredState) {
-        if(desiredState != currentState)
+        if (desiredState != currentState)
             stateHasChanged = true;
         currentState = desiredState;
     }
 
-    public void setMode(TrajectoryMode desiredMode){
-        if(desiredMode != currentMode)
+    public void setMode(TrajectoryMode desiredMode) {
+        if (desiredMode != currentMode)
             modeHasChanged = true;
         currentMode = desiredMode;
     }
-    public SwerveKinematics getKinematics(){
+
+    public SwerveKinematics getKinematics() {
         return inverseKinematics;
     }
 
-    public void resetModulePose(Pose2d newpose){
+    public void resetModulePose(Pose2d newpose) {
         modules.forEach((m) -> m.resetPose(newpose));
     }
 
@@ -193,25 +190,21 @@ public class SwerveDrive extends Subsystem {
         if (translationVector.norm() <= translationDeadband) {
             translationVector = new Translation2d();
         }
-        if(DriverStation.getAlliance().get().equals(Alliance.Blue))
+        if (DriverStation.getAlliance().get().equals(Alliance.Blue))
             translationVector = translationVector.inverse();
         rotationScalar *= 0.025;
         if (translationVector.norm() <= translationDeadband && Math.abs(rotation) <= rotationDeadband) {
             this.commandModuleDrivePowers(0);
-        } else {
-            this.update();
-
         }
-        this.update();
 
     }
 
-    public void setAlignment(Pose2d pose){
+    public void setAlignment(Pose2d pose) {
         mAutoAlignMotionPlanner.setTargetPoint(pose);
         robotState.setDisplaySetpointPose(pose);
     }
 
-    public void setLob(boolean newlob){
+    public void setLob(boolean newlob) {
         this.lob = newlob;
     }
 
@@ -230,8 +223,8 @@ public class SwerveDrive extends Subsystem {
         }
     }
 
-    public void commandModuleVelocitys(List<Translation2d> moduleVectors){
-         this.moduleVectors = moduleVectors;
+    public void commandModuleVelocitys(List<Translation2d> moduleVectors) {
+        this.moduleVectors = moduleVectors;
         for (int i = 0; i < moduleVectors.size(); i++) {
             if (Util.shouldReverse(moduleVectors.get(i).direction(),
                     Rotation2d.fromDegrees(modules.get(i).getModuleAngle()))) {
@@ -244,8 +237,9 @@ public class SwerveDrive extends Subsystem {
             }
         }
     }
-    public void commandModuleVelocitysPercentages(List<Translation2d> moduleVectors){
-         this.moduleVectors = moduleVectors;
+
+    public void commandModuleVelocitysPercentages(List<Translation2d> moduleVectors) {
+        this.moduleVectors = moduleVectors;
         for (int i = 0; i < moduleVectors.size(); i++) {
             if (Util.shouldReverse(moduleVectors.get(i).direction(),
                     Rotation2d.fromDegrees(modules.get(i).getModuleAngle()))) {
@@ -258,6 +252,7 @@ public class SwerveDrive extends Subsystem {
             }
         }
     }
+
     public void commandModuleDrivePowers(double power) {
         for (int i = 0; i < modules.size(); i++) {
             modules.get(i).setDriveOpenLoop(power);
@@ -278,129 +273,149 @@ public class SwerveDrive extends Subsystem {
         return Rotation2d.fromDegrees(gyro.getAngle());
     }
 
-    public List<SwerveDriveModule> getModules(){
+    public List<SwerveDriveModule> getModules() {
         return modules;
     }
-    
-    public boolean isStatusOK(){
-        for(SwerveDriveModule m:modules){
-            if(m.getModuleStatus().equals(ModuleStatus.OK))
+
+    public boolean isStatusOK() {
+        for (SwerveDriveModule m : modules) {
+            if (m.getModuleStatus().equals(ModuleStatus.OK))
                 return false;
         }
         return true;
     }
 
-    @Override
-    public void update() {
-        double timeStamp = Timer.getFPGATimestamp();
-        poseMeters = robotState.getKalmanPose(timeStamp);
-        drivingPose = Pose2d.fromRotation(getRobotHeading());
-        double rotationCorrection;
-        switch (currentState) {
-            case MANUAL:
-                if(stateHasChanged){
-                    headingController.setTargetHeading(getRobotHeading().inverse().flip());
-                }
-                rotationCorrection = headingController.updateRotationCorrection(drivingPose.getRotation().inverse().flip(),
-                        timeStamp);
-                if (translationVector.norm() == 0 || rotationScalar != 0) {
-                    rotationCorrection = 0;
-                }
-                commandModules(inverseKinematics.updateDriveVectors(translationVector,
-                        rotationScalar + rotationCorrection, drivingPose, robotCentric));
-                break;
+    public void registerEnabledLoops(ILooper mEnabledLooper) {
+        mEnabledLooper.register(new Loop() {
+            @Override
+            public void onStart(double timestamp) {
 
-            case ALIGNMENT:
-                if (stateHasChanged) {
-                    mAutoAlignMotionPlanner.reset();
-                }
-                ChassisSpeeds targetChassisSpeeds = updateAutoAlign();
-                commandModuleVelocitys(inverseKinematics.updateDriveVectors(new Translation2d(
-                    -targetChassisSpeeds.vxMetersPerSecond,
-                    targetChassisSpeeds.vyMetersPerSecond),
-                    targetChassisSpeeds.omegaRadiansPerSecond*8,
-                    poseMeters,
-                    false
-                    ));
-                break;
+            }
 
-            case TRAJECTORY:
-                if(DriverStation.isTeleop() && translationVector.norm() != 0){
-                    setState(State.MANUAL);
-                }
-                mDriveMotionPlanner.updateTrajectory();
-                switch (currentMode) {
-                    case FOLLOWING:
-                        translationVector = mDriveMotionPlanner.getTranslation2dToFollow(timeStamp);
-                        headingController.setTargetHeading(mDriveMotionPlanner.getTargetHeading().inverse());
-
+            @Override
+            public void onLoop(double timestamp) {
+                poseMeters = robotState.getKalmanPose(timestamp);
+                drivingPose = Pose2d.fromRotation(getRobotHeading());
+                double rotationCorrection;
+                switch (currentState) {
+                    case MANUAL:
+                        if (stateHasChanged) {
+                            headingController.setTargetHeading(getRobotHeading().inverse().flip());
+                        }
+                        rotationCorrection = headingController.updateRotationCorrection(
+                                drivingPose.getRotation().inverse().flip(),
+                                timestamp);
+                        if (translationVector.norm() == 0 || rotationScalar != 0) {
+                            rotationCorrection = 0;
+                        }
+                        commandModules(inverseKinematics.updateDriveVectors(translationVector,
+                                rotationScalar + rotationCorrection, drivingPose, robotCentric));
                         break;
-                    case TRACKING:
-                        if(modeHasChanged)
-                            mDriveMotionPlanner.resetNoteTracking();
-                        Pose2d targetPose = new Pose2d();
-                        translationVector = targetPose.getTranslation();
-                        headingController.setTargetHeading(targetPose.getRotation().inverse());
+
+                    case ALIGNMENT:
+                        if (stateHasChanged) {
+                            mAutoAlignMotionPlanner.reset();
+                        }
+                        ChassisSpeeds targetChassisSpeeds = updateAutoAlign();
+                        commandModuleVelocitys(inverseKinematics.updateDriveVectors(new Translation2d(
+                                -targetChassisSpeeds.vxMetersPerSecond,
+                                targetChassisSpeeds.vyMetersPerSecond),
+                                targetChassisSpeeds.omegaRadiansPerSecond * 8,
+                                poseMeters,
+                                false));
                         break;
-                }
-                        rotationCorrection = headingController.getRotationCorrection(getRobotHeading().inverse().flip(), timeStamp);
+
+                    case TRAJECTORY:
+                        if (DriverStation.isTeleop() && translationVector.norm() != 0) {
+                            setState(State.MANUAL);
+                        }
+                        mDriveMotionPlanner.updateTrajectory();
+                        switch (currentMode) {
+                            case FOLLOWING:
+                                translationVector = mDriveMotionPlanner.getTranslation2dToFollow(timestamp);
+                                headingController.setTargetHeading(mDriveMotionPlanner.getTargetHeading().inverse());
+
+                                break;
+                            case TRACKING:
+                                if (modeHasChanged)
+                                    mDriveMotionPlanner.resetNoteTracking();
+                                Pose2d targetPose = new Pose2d();
+                                translationVector = targetPose.getTranslation();
+                                headingController.setTargetHeading(targetPose.getRotation().inverse());
+                                break;
+                        }
+                        rotationCorrection = headingController.getRotationCorrection(getRobotHeading().inverse().flip(),
+                                timestamp);
                         desiredRotationScalar = rotationCorrection;
-                        commandModules(inverseKinematics.updateDriveVectors(translationVector, rotationCorrection, poseMeters,
+                        commandModules(
+                                inverseKinematics.updateDriveVectors(translationVector, rotationCorrection, poseMeters,
+                                        robotCentric));
+                        break;
+                    case TARGETOBJECT:
+                        rotationCorrection = mTargetPiecePlanner.updateAiming(timestamp,
+                                objectVision.getLatestVisionUpdate(), headingController, getRobotHeading());
+                        commandModules(
+                                inverseKinematics.updateDriveVectors(translationVector.scale(.5),
+                                        rotationCorrection * .7 + rotationScalar, drivingPose, robotCentric));
+                        break;
+                    case AIMING:
+                        Pose2d demandedAngle;
+                        if (!lob)
+                            demandedAngle = mAimingPlanner.updateAiming(
+                                    timestamp,
+                                    RobotState.getInstance().getLatestPoseFromOdom().getValue(),
+                                    Pose2d.fromTranslation(RobotState.getInstance().getLatestVisionPoseComponent()),
+                                    AimingRequest.SPEAKER,
+                                    odometryVision.getLatestVisionUpdate(),
+                                    headingController,
+                                    robotState.getSmoothedVelocity());
+                        else
+                            demandedAngle = mAimingPlanner.updateAiming(
+                                    timestamp,
+                                    RobotState.getInstance().getLatestPoseFromOdom().getValue(),
+                                    Pose2d.fromTranslation(RobotState.getInstance().getLatestVisionPoseComponent()),
+                                    AimingRequest.LOB,
+                                    odometryVision.getLatestVisionUpdate(),
+                                    headingController,
+                                    robotState.getSmoothedVelocity());
+                        commandModules(
+                                inverseKinematics.updateDriveVectors(translationVector.scale(.3),
+                                        demandedAngle.getRotation().getDegrees() + rotationScalar, drivingPose,
+                                        robotCentric));
+                        break;
+
+                    case OFF:
+                        commandModules(inverseKinematics.updateDriveVectors(new Translation2d(), 0, drivingPose,
                                 robotCentric));
-                break;
-            case TARGETOBJECT:
-                rotationCorrection = mTargetPiecePlanner.updateAiming(timeStamp, objectVision.getLatestVisionUpdate(), headingController, getRobotHeading());
-                commandModules(
-                        inverseKinematics.updateDriveVectors(translationVector.scale(.5),
-                        rotationCorrection*.7+rotationScalar, drivingPose, robotCentric));
-                break;
-            case AIMING:
-            Pose2d demandedAngle;
-                    if(!lob)
-                    demandedAngle = mAimingPlanner.updateAiming(
-                        timeStamp,
-                        RobotState.getInstance().getLatestPoseFromOdom().getValue(),
-                        Pose2d.fromTranslation(RobotState.getInstance().getLatestVisionPoseComponent()),
-                        AimingRequest.SPEAKER,
-                        odometryVision.getLatestVisionUpdate(),
-                        headingController,
-                        robotState.getSmoothedVelocity());
-                    else
-                       demandedAngle = mAimingPlanner.updateAiming(
-                        timeStamp,
-                        RobotState.getInstance().getLatestPoseFromOdom().getValue(),
-                        Pose2d.fromTranslation(RobotState.getInstance().getLatestVisionPoseComponent()),
-                        AimingRequest.LOB,
-                        odometryVision.getLatestVisionUpdate(),
-                        headingController,
-                        robotState.getSmoothedVelocity());
-                commandModules(
-                        inverseKinematics.updateDriveVectors(translationVector.scale(.3),
-                        demandedAngle.getRotation().getDegrees()+rotationScalar, drivingPose, robotCentric));
-                break;
+                        break;
 
-            case OFF:
-                commandModules(inverseKinematics.updateDriveVectors(new Translation2d(), 0, drivingPose, robotCentric));
-                break;
+                    case SNAP:
+                        headingController.setTargetHeading(mDriveMotionPlanner.getTargetHeading());
+                        rotationCorrection = headingController.getRotationCorrection(getRobotHeading(), timestamp);
+                        desiredRotationScalar = rotationCorrection;
+                        commandModules(
+                                inverseKinematics.updateDriveVectors(translationVector, rotationCorrection, poseMeters,
+                                        robotCentric));
+                        break;
 
-            case SNAP:
-                headingController.setTargetHeading(mDriveMotionPlanner.getTargetHeading());
-                rotationCorrection = headingController.getRotationCorrection(getRobotHeading(), timeStamp);
-                desiredRotationScalar = rotationCorrection;
-                commandModules(inverseKinematics.updateDriveVectors(translationVector, rotationCorrection, poseMeters,
-                        robotCentric));
-                break;
+                }
+                stateHasChanged = false;
 
-        }
-        stateHasChanged = false;
+            }
+
+            @Override
+            public void onStop(double timestamp) {
+            }
+        });
     }
 
-
-    public ChassisSpeeds updateAutoAlign(){
+    public ChassisSpeeds updateAutoAlign() {
         final double now = Timer.getFPGATimestamp();
         var fieldToOdometry = robotState.getAbsoluteVisionPoseComponent(now);
         var odomToVehicle = robotState.getPoseFromOdom(now);
-        ChassisSpeeds output = mAutoAlignMotionPlanner.updateAutoAlign(now, odomToVehicle, Pose2d.fromTranslation(fieldToOdometry), robotState.getMeasuredVelocity(),headingController, getRobotHeading());
+        ChassisSpeeds output = mAutoAlignMotionPlanner.updateAutoAlign(now, odomToVehicle,
+                Pose2d.fromTranslation(fieldToOdometry), robotState.getMeasuredVelocity(), headingController,
+                getRobotHeading());
         return output;
     }
 
@@ -412,10 +427,10 @@ public class SwerveDrive extends Subsystem {
     public void fieldzeroSwerve() {// starts the zero 180 off
         headingController.setTargetHeading(Rotation2d.fromDegrees(0));
         gyro.setAngle(180);
-        if(DriverStation.getAlliance().get().equals(Alliance.Blue)){
-        headingController.setTargetHeading(Rotation2d.fromDegrees(180));
+        if (DriverStation.getAlliance().get().equals(Alliance.Blue)) {
+            headingController.setTargetHeading(Rotation2d.fromDegrees(180));
             gyro.setAngle(0);
-    }
+        }
 
     }
 
@@ -469,34 +484,35 @@ public class SwerveDrive extends Subsystem {
         };
     }
 
-    public Request isAimedRequest(){
+    public Request isAimedRequest() {
         return new Request() {
             @Override
-            public boolean isFinished(){
+            public boolean isFinished() {
                 return mAimingPlanner.isAimed();
             }
         };
     }
 
-    public Request isAlignedRequest(){
+    public Request isAlignedRequest() {
         return new Request() {
             @Override
-            public boolean isFinished(){
+            public boolean isFinished() {
                 return mAutoAlignMotionPlanner.getAutoAlignmentCompleted();
             }
         };
     }
-    public synchronized ChassisSpeeds getSetPoint(){
+
+    public synchronized ChassisSpeeds getSetPoint() {
         var desiredThrottleSpeed = translationVector.x() * Constants.SwerveMaxspeedMPS;
         var desiredStrafeSpeed = translationVector.y() * Constants.SwerveMaxspeedMPS;
-        var desiredRotationSpeed = rotationScalar * Conversions.falconToMPS(Constants.kSwerveRotationMaxSpeed, Constants.kWheelCircumference, Options.driveRatio);
+        var desiredRotationSpeed = rotationScalar * Conversions.falconToMPS(Constants.kSwerveRotationMaxSpeed,
+                Constants.kWheelCircumference, Options.driveRatio);
         return ChassisSpeeds.fromRobotRelativeSpeeds(desiredThrottleSpeed, desiredStrafeSpeed, desiredRotationSpeed);
     }
 
-
-    public void snapToPoint(Pose2d targetPoint){
-        if(mAutoAlignMotionPlanner != null){
-            if(currentState != State.ALIGNMENT){
+    public void snapToPoint(Pose2d targetPoint) {
+        if (mAutoAlignMotionPlanner != null) {
+            if (currentState != State.ALIGNMENT) {
                 mAutoAlignMotionPlanner.reset();
                 setState(State.ALIGNMENT);
             }
@@ -511,8 +527,7 @@ public class SwerveDrive extends Subsystem {
         modules.forEach((m) -> m.outputTelemetry());
         Logger.recordOutput("Heading", getRobotHeading().getDegrees());
         Logger.recordOutput("Desired Heading", headingController.getTargetHeading());
-        }
-
+    }
 
     @Override
     public void stop() {// stops everything
@@ -520,7 +535,6 @@ public class SwerveDrive extends Subsystem {
         translationVector = new Translation2d();
         rotationScalar = 0;
 
-        update();
         commandModuleDrivePowers(0);
 
     }

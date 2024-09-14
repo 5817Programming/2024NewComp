@@ -1,40 +1,132 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package com.uni.frc;
-
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import com.uni.frc.loops.ILooper;
+import com.uni.frc.loops.Loop;
+import com.uni.frc.loops.Looper;
 import com.uni.frc.subsystems.Subsystem;
 
-/** Add your docs here. */
-public class SubsystemManager {//up   dates all new subsystem methods
+/**
+ * Used to reset, start, stop, and update all subsystems at once
+ */
+public class SubsystemManager implements ILooper {
+	public static SubsystemManager mInstance = null;
 
-    public static List<Subsystem> allSubsystems;
+	private List<Subsystem> mAllSubsystems;
+	private List<Loop> mLoops = new ArrayList<>();
+	private double read_dt = 0.0;
+	private double on_loop_dt = 0.0;
+	private double write_dt = 0.0;
 
+	private SubsystemManager() {}
 
-    public SubsystemManager() {
+	public static SubsystemManager getInstance() {
+		if (mInstance == null) {
+			mInstance = new SubsystemManager();
+		}
 
-    }
+		return mInstance;
+	}
 
-    public void addSystems(List<Subsystem> subsystemList) {
-        allSubsystems = subsystemList;
-    }
+	public void outputTelemetry() {
+		if (Constants.disableExtraTelemetry) {
+			return;
+		}
+		mAllSubsystems.forEach(Subsystem::outputTelemetry);
+	}
 
-    public void readSystemsPeriodicInputs() {
-        allSubsystems.forEach((system)-> {system.readPeriodicInputs();});
-    }
-    public void writeSubsystemsPeriodicOutputs() {
-        allSubsystems.forEach((system)->{system.writePeriodicOutputs();});
-    }
-    public void updateSubsystems() {
-        allSubsystems.forEach((system)-> {system.update();});
-    }
-    public void outputSystemsTelemetry() {
-        allSubsystems.forEach((system)-> {system.outputTelemetry();});
-    }
-    public void stopSubsystems() {
-        allSubsystems.forEach((system)-> {system.stop();});
-    }
+	public boolean checkSubsystems() {
+		boolean ret_val = true;
+
+		for (Subsystem s : mAllSubsystems) {
+			ret_val &= s.checkSystem();
+		}
+
+		return ret_val;
+	}
+
+	public void stop() {
+		mAllSubsystems.forEach(Subsystem::stop);
+	}
+
+	public List<Subsystem> getSubsystems() {
+		return mAllSubsystems;
+	}
+
+	public void setSubsystems(Subsystem... allSubsystems) {
+		mAllSubsystems = Arrays.asList(allSubsystems);
+	}
+
+	private class EnabledLoop implements Loop {
+		@Override
+		public void onStart(double timestamp) {
+			mLoops.forEach(l -> l.onStart(timestamp));
+		}
+
+		@Override
+		public void onLoop(double timestamp) {
+			// Read
+			for (int i = 0; i < mAllSubsystems.size(); i++) {
+				mAllSubsystems.get(i).readPeriodicInputs();
+			}
+
+			// On loop
+			for (int i = 0; i < mLoops.size(); i++) {
+				mLoops.get(i).onLoop(timestamp);
+			}
+			on_loop_dt = Timer.getFPGATimestamp() - (timestamp + read_dt);
+
+			// Write
+			for (int i = 0; i < mAllSubsystems.size(); i++) {
+				mAllSubsystems.get(i).writePeriodicOutputs();
+			}
+			write_dt = Timer.getFPGATimestamp() - (timestamp + on_loop_dt);
+
+			// Telemetry
+			outputTelemetry();
+		}
+
+		@Override
+		public void onStop(double timestamp) {
+			mLoops.forEach(l -> l.onStop(timestamp));
+		}
+	}
+
+	private class DisabledLoop implements Loop {
+		@Override
+		public void onStart(double timestamp) {}
+
+		@Override
+		public void onLoop(double timestamp) {
+			mAllSubsystems.forEach(Subsystem::readPeriodicInputs);
+			outputTelemetry();
+		}
+
+		@Override
+		public void onStop(double timestamp) {}
+	}
+
+	public void registerEnabledLoops(Looper enabledLooper) {
+		mAllSubsystems.forEach(s -> s.registerEnabledLoops(this));
+		enabledLooper.register(new EnabledLoop());
+	}
+
+	public void registerDisabledLoops(Looper disabledLooper) {
+		disabledLooper.register(new DisabledLoop());
+	}
+
+	@Override
+	public void register(Loop loop) {
+		mLoops.add(loop);
+	}
+
+	public void outputLoopTimes() {
+		SmartDashboard.putNumber("LooperTimes/ReadDT", read_dt);
+		SmartDashboard.putNumber("LooperTimes/OnLoopDT", on_loop_dt);
+		SmartDashboard.putNumber("LooperTimes/WriteDT", write_dt);
+	}
 }

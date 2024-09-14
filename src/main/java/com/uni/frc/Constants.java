@@ -151,6 +151,8 @@ public class Constants {
 
     public static final boolean tuningMode = true;
 
+    public static final boolean disableExtraTelemetry = true;
+
     public static final class ShooterConstants {
         public static final double HANDOFF = 0;
         public static final double IDLE = 0;
