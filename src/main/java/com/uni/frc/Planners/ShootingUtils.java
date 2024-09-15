@@ -107,7 +107,7 @@ public class ShootingUtils {
 
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> getPivotMap(boolean lob){
-        System.out.println(lob);
+
         if
         (lob)
             return Constants.PivotConstants.LobAngleMap;

@@ -14,12 +14,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 
 import com.uni.frc.Autos.AutoBase;
-import com.uni.frc.Autos.M6;
-import com.uni.frc.Autos.MS6;
-import com.uni.frc.Autos.S4;
-import com.uni.frc.Autos.NS1;
-import com.uni.frc.Autos.S1;
-import com.uni.frc.Autos.Shoot;
+import com.uni.frc.Autos.AutoExecuter;
+import com.uni.frc.Autos.Modes.M6;
 import com.uni.frc.Controls.Controls;
 import com.uni.frc.loops.Looper;
 import com.uni.frc.subsystems.Arm;
@@ -53,6 +49,7 @@ public class Robot extends LoggedRobot {
     Controls controls;
     SubsystemManager mSubsystemManager;
     SuperStructure s = SuperStructure.getInstance();
+  AutoExecuter autoExecuter = new AutoExecuter();
     SwerveDrive swerve;
     double yaw;
     OdometryLimeLight vision;
@@ -68,7 +65,7 @@ public class Robot extends LoggedRobot {
       autos.put("Middle 6", new M6());
   
   
-      autos.put("1", new Shoot());
+      // autos.put("1", new Shoot());
   
       DriverStation.startDataLog(DataLogManager.getLog());
   
@@ -121,10 +118,11 @@ public class Robot extends LoggedRobot {
       swerve.fieldzeroSwerve();
       swerve.zeroModules();
       SuperStructure.getInstance().setState(SuperState.AUTO);
-      Pivot.getInstance().conformToState(Pivot.State.MAXUP);
-      Indexer.getInstance().setPiece(true);
       mEnabledLooper.start();
       mDisabledLooper.stop();
+
+      autoExecuter.setAuto(new M6());
+      autoExecuter.start();
     }
   
     /** This function is called periodically during autonomous. */
@@ -158,13 +156,14 @@ public class Robot extends LoggedRobot {
       SuperStructure.getInstance().clearQueues();
       mEnabledLooper.stop();
       mDisabledLooper.start();
-      
+      autoExecuter.stop();
+      autoExecuter = new AutoExecuter();
     }
   
     /** This function is called periodically when disabled. */
     @Override
     public void disabledPeriodic() {
-  
+      
   
     }
   

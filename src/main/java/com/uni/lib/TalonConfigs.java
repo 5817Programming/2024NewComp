@@ -31,7 +31,7 @@ public class TalonConfigs {
         driveConfigs.Slot0.kV = .12;
         driveConfigs.Slot0.kS = .25;
         driveConfigs.Slot0.kA = .01;
-        driveConfigs.Slot0.kP = .05;
+        driveConfigs.Slot0.kP = .1;
         driveConfigs.Slot0.kI = 0;
         driveConfigs.Slot0.kD = 0;
         driveConfigs.CurrentLimits.StatorCurrentLimit = 80;

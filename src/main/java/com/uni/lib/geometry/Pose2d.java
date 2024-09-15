@@ -1,3 +1,5 @@
+
+
 package com.uni.lib.geometry;
 
 import com.uni.lib.util.Util;
@@ -19,7 +21,6 @@ public class Pose2d implements IPose2d<Pose2d> {
 
     protected final Translation2d translation_;
     protected final Rotation2d rotation_;
-
 
     public Pose2d() {
         translation_ = new Translation2d();
@@ -46,10 +47,6 @@ public class Pose2d implements IPose2d<Pose2d> {
         rotation_ = new Rotation2d(other.getRotation());
     }
 
-    public edu.wpi.first.math.geometry.Pose2d toWPI(){
-        return new edu.wpi.first.math.geometry.Pose2d(translation_.x(),translation_.y(), edu.wpi.first.math.geometry.Rotation2d.fromDegrees(rotation_.getDegrees()));
-    }
-
     public static Pose2d fromTranslation(final Translation2d translation) {
         return new Pose2d(translation, new Rotation2d());
     }
@@ -58,6 +55,9 @@ public class Pose2d implements IPose2d<Pose2d> {
         return new Pose2d(new Translation2d(), rotation);
     }
 
+    public edu.wpi.first.math.geometry.Pose2d toWPI(){
+        return new edu.wpi.first.math.geometry.Pose2d(translation_.x(),translation_.y(), edu.wpi.first.math.geometry.Rotation2d.fromDegrees(rotation_.getDegrees()));
+    }
     /**
      * Obtain a new Pose2d from a (constant curvature) velocity. See:
      * https://github.com/strasdat/Sophus/blob/master/sophus/se2.hpp
@@ -76,10 +76,11 @@ public class Pose2d implements IPose2d<Pose2d> {
         return new Pose2d(new Translation2d(delta.dx * s - delta.dy * c, delta.dx * c + delta.dy * s),
                 new Rotation2d(cos_theta, sin_theta, false));
     }
-
     public static Pose2d projectTwist(final Twist2d delta){
         return new Pose2d(new Translation2d(delta.dx,delta.dy),new Rotation2d());
     }
+
+
 
     /**
      * Logical inverse of the above.
@@ -256,5 +257,13 @@ public class Pose2d implements IPose2d<Pose2d> {
     @Override
     public Pose2d mirror() {
         return new Pose2d(new Translation2d(getTranslation().x(), -getTranslation().y()), getRotation().inverse());
+    }
+
+    public Pose2d mirrorAboutX(double xValue) {
+        return new Pose2d(getTranslation().mirrorAboutX(xValue), getRotation().mirrorAboutX());
+    }
+
+    public Pose2d mirrorAboutY(double yValue) {
+        return new Pose2d(getTranslation().mirrorAboutY(yValue), getRotation().mirrorAboutY());
     }
 }

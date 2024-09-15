@@ -79,14 +79,14 @@ public class Constants {
             -mRobotBaseLength / 2);
     public static final Translation2d mRearRightPosition = new Translation2d(-mRobotBaseWidth / 2,
             mRobotBaseLength / 2);
+    public static final Translation2d[] mModulePositions = {
+			new Translation2d(mRobotBaseLength / 2.0, mRobotBaseWidth / 2.0),
+			new Translation2d(mRobotBaseLength / 2.0, -mRobotBaseWidth / 2.0),
+			new Translation2d(-mRobotBaseLength / 2.0, mRobotBaseWidth / 2.0),
+			new Translation2d(-mRobotBaseLength / 2.0, -mRobotBaseWidth / 2.0)
+		};
 
-    public static final Translation2d[] mModulePositions = new Translation2d[] {
-        mFrontRightPosition,
-        mFrontLeftPosition,
-        mRearLeftPosition,
-        mRearRightPosition
-    };
- 
+
     public static final List<Translation2d> kModulePositions = Arrays.asList(kFrontRightPosition, kFrontLeftPosition,
             kRearLeftPosition, kRearRightPosition);
 
@@ -151,7 +151,9 @@ public class Constants {
 
     public static final boolean tuningMode = true;
 
-    public static final boolean disableExtraTelemetry = true;
+    public static final boolean disableExtraTelemetry = false;
+
+public static final double kLooperDt = 0.02;
 
     public static final class ShooterConstants {
         public static final double HANDOFF = 0;

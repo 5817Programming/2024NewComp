@@ -39,9 +39,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public class SuperStructure extends Subsystem {
     protected Intake mIntake;
     protected OdometryLimeLight vision;
-    protected DriveMotionPlanner mDriveMotionPlanner;
     protected Logger logger;
-    protected DriveMotionPlanner dMotionPlanner;
     protected RobotState mRobotState;
     protected Indexer mIndexer;
     protected Pivot mPivot;
@@ -56,7 +54,6 @@ public class SuperStructure extends Subsystem {
     public SuperStructure() {
         mPathStateGenerator = PathStateGenerator.getInstance();
         vision = OdometryLimeLight.getInstance();
-        mDriveMotionPlanner = DriveMotionPlanner.getInstance();
         mArm = Arm.getInstance();
         mRobotState = RobotState.getInstance();
         mIntake = Intake.getInstance();
@@ -536,30 +533,6 @@ public class SuperStructure extends Subsystem {
         queue(mPivot.stateRequest(position));
     }
 
-    public void trajectoryState(PathPlannerTrajectory trajectory, double initRotation) {
-        RequestList request = new RequestList(Arrays.asList(
-                logCurrentRequest("trajectory")), true);
-        RequestList queue = new RequestList(Arrays.asList(
-                mDriveMotionPlanner.setTrajectoryRequest(trajectory, initRotation, true),
-                mDrive.setStateRequest(SwerveDrive.State.TRAJECTORY),
-                mDriveMotionPlanner.startPathRequest(true)), false);
-        queue(request);
-        queue(queue);
-    }
-
-    public void onTheFlyTrajectoryState(Pose2d endPose, double timestamp) {
-        RequestList request = new RequestList(Arrays.asList(
-                logCurrentRequest("OnTheFly"),
-                mDriveMotionPlanner.generatePathRequest(
-                        mRobotState.getKalmanPose(timestamp),
-                        endPose,
-                        ChassisSpeeds.fromTwist2d(mRobotState.getPredictedVelocity(), mDrive.getRobotHeading()),
-                        false),
-                mDrive.setStateRequest(SwerveDrive.State.TRAJECTORY),
-                mDriveMotionPlanner.startPathRequest(false)), false);
-
-        request(request);
-    }
 
     public void intakeState() {
         RequestList request = new RequestList(Arrays.asList(
@@ -615,31 +588,8 @@ public class SuperStructure extends Subsystem {
         queue(mShooter.setPercentRequest(percent));
     }
 
-    public void waitForEventState(double timestamp) {
-        queue(mDriveMotionPlanner.waitForTrajectoryRequest(timestamp));
-    }
-
     public void setManual(boolean Override) {
         manual = Override;
-    }
-
-    public void waitForPositionState(Translation2d other) {
-        queue(
-                new Request() {
-                    @Override
-                    public boolean isFinished() {
-                        Logger.recordOutput("event", Pose2d.fromTranslation(other.reflect()).toWPI());
-                        double timeStamp = Timer.getFPGATimestamp();
-                        if (DriverStation.getAlliance().get().equals(Alliance.Blue))
-                            return other.translateBy(
-                                    mRobotState.getKalmanPose(timeStamp).getTranslation().inverse())
-                                    .norm() < 0.7;
-                        return other.reflect().translateBy(
-                                mRobotState.getKalmanPose(timeStamp).getTranslation().inverse())
-                                .norm() < 0.7;
-
-                    }
-                });
     }
 
     public void printState(String string) {

@@ -92,6 +92,7 @@ public class Rotation2d implements IRotation2d<Rotation2d> {
         return edu.wpi.first.math.geometry.Rotation2d.fromRadians(this.getRadians());
     }
 
+
     public static Rotation2d fromRadians(double angle_radians) {
         return new Rotation2d(angle_radians, true);
     }
@@ -155,6 +156,15 @@ public class Rotation2d implements IRotation2d<Rotation2d> {
 
     public Rotation2d minus(Rotation2d other) {
         return rotateBy(other.unaryMinus());
+    }
+
+    public Rotation2d mirrorAboutX() {
+        ensureTrigComputed();
+        return new Rotation2d(-cos_angle_, sin_angle_, false);
+    }
+
+    public Rotation2d mirrorAboutY() {
+        return new Rotation2d(cos_angle_, -sin_angle_, false);
     }
 
     public Rotation2d times(double scalar) {
