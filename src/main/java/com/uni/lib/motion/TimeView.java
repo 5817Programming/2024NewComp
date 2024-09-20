@@ -36,21 +36,18 @@ public class TimeView {
         State state = mTrajectory.sample(t);
 
         Pose2d pose = new Pose2d(new Translation2d(state.positionMeters), new Rotation2d(state.targetHolonomicRotation).inverse());
-        double xVel = state.velocityMps * Math.cos(state.heading.getRadians());
-        double yVel = state.velocityMps * Math.sin(state.heading.getRadians());
         double headingRate = 0;
 
         double curvature = state.curvatureRadPerMeter;
         Rotation2d motion_direction = new Rotation2d(state.heading);
         if(DriverStation.getAlliance().get() == Alliance.Red){
             pose = pose.mirrorAboutX(8.25);
-            xVel *= -1;
             headingRate *= -1;
             motion_direction = motion_direction.flip();
         }
 
 
-        return new PathPointState(pose, motion_direction, curvature, state.velocityMps/2, state.accelerationMpsSq/2, t, headingRate/2);
+        return new PathPointState(pose, motion_direction, curvature, state.velocityMps, state.accelerationMpsSq, t, headingRate);
     }
 
     public PathPlannerTrajectory getTrajectory(){        

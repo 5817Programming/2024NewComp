@@ -210,7 +210,7 @@ public class DriveMotionPlanner {
 
             switch (mFollowerType) {
 				case PID:
- 				sample_point = mCurrentTrajectory.advance(mDt/2);
+ 				sample_point = mCurrentTrajectory.advance(mDt);
 				System.out.println("Ran");
 				// RobotState.getInstance().setDisplaySetpointPose(Pose2d.fromTranslation(RobotState.getInstance().getFieldToOdom(timestamp)).transformBy(sample_point.state().state().getPose()));
 				mSetpoint = sample_point;
