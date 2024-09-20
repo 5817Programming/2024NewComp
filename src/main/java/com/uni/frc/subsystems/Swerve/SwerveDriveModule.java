@@ -16,7 +16,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.uni.frc.Constants;
 import com.uni.frc.Options;
 import com.uni.frc.Ports;
-import com.uni.frc.subsystems.PeriodicIOAutoLogged;
 import com.uni.frc.subsystems.Subsystem;
 import com.uni.frc.subsystems.encoders.CANEncoder;
 import com.uni.frc.subsystems.encoders.Encoder;

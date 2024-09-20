@@ -108,12 +108,11 @@ public class OdometryLimeLight extends Subsystem {
     mPeriodicIO.ta = table.getEntry("ta").getDouble(0);
     LimelightHelpers.SetRobotOrientation("limelight-up", 180-Pigeon.getInstance().getAngle(), 0, 0, 0, 0, 0);
     Pose2d mt2 = new Pose2d(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-up").pose);
-    
 
     int tagId = mPeriodicIO.tagId;
 
     if (mPeriodicIO.seesTarget) {
-      if (mt2 != Pose2d.identity()) {
+      if (mt2 != Pose2d.identity() && mPeriodicIO.useVision) {
         mPeriodicIO.visionUpdate = Optional 
             .of(new VisionUpdate(timestamp - mPeriodicIO.latency, mt2));
         RobotState.getInstance().addVisionUpdate(
@@ -124,6 +123,11 @@ public class OdometryLimeLight extends Subsystem {
       }
     } else {
       mPeriodicIO.visionUpdate = Optional.empty();
+    }
+  }
+  public void setVision(boolean useVision){
+    if(useVision != mPeriodicIO.useVision){
+      mPeriodicIO.useVision = useVision;
     }
   }
 
@@ -287,6 +291,7 @@ public class OdometryLimeLight extends Subsystem {
     public double ta = 0;
     public double tx = 0;
     public double ty = 0;
+    public boolean useVision = true;
   }
 
   @Override
