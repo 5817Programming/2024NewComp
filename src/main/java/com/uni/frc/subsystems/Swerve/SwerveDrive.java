@@ -158,6 +158,10 @@ boolean mOverrideTrajectory = false;
         return this.currentState;
     }
 
+    public Pose2d getPose() {
+        return poseMeters;
+    }
+
     public void setState(State desiredState) {
         if (desiredState != currentState)
             stateHasChanged = true;

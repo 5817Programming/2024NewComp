@@ -294,9 +294,9 @@ public static final double kLooperDt = 0.02;
     }
     
 public static final class FieldConstants {
-
+    public static double kFieldLength = Units.inchesToMeters(651.223);
     public final static double kSpeakerHeight = 2.07;
-    
+
          public static double[] reflect(double xs[]) {
             for(int i =0; i<xs.length; i++){
                 xs[i] =16.5-xs[i];
