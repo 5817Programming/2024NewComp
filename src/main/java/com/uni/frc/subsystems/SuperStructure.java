@@ -602,8 +602,10 @@ public class SuperStructure extends Subsystem {
     }
 
     public void shootState(boolean Override) {
+
         if (Override) {
             RequestList queue = new RequestList(Arrays.asList(
+                    logCurrentRequest("Shoot State"),
                     mShooter.atTargetRequest(),
                     mPivot.atTargetRequest(),
                     mDrive.isAimedRequest(),
@@ -617,6 +619,7 @@ public class SuperStructure extends Subsystem {
             request(queue);
         } else {
             RequestList queue = new RequestList(Arrays.asList(
+                    logCurrentRequest("Shoot State"),
                     mLights.setColorRequest(Color.AIMING),
                     // mPivot.atTargetRequest(),
                     mLights.setColorRequest(Color.SHOOTING),
@@ -729,8 +732,8 @@ public class SuperStructure extends Subsystem {
     @Override
     public void outputTelemetry() {
         Logger.recordOutput("Countinuous Shoot", continuousShoot);
-        Logger.recordOutput("RequestsCompleted", requestsCompleted());
-        Logger.recordOutput("CurrentRequest", currentRequestLog);
+        Logger.recordOutput("SuperStructure/RequestsCompleted", requestsCompleted());
+        Logger.recordOutput("SuperStructure/CurrentRequest", currentRequestLog);
     }
 
     @Override

@@ -1,12 +1,13 @@
 package com.uni.frc.Autos.Actions;
 
-import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.uni.frc.subsystems.Swerve.SwerveDrive;
+import com.uni.frc.subsystems.Swerve.SwerveDrive.State;
 import com.uni.lib.geometry.Rotation2d;
 import com.uni.lib.motion.TimeView;
 import com.uni.lib.motion.TrajectoryIterator;
+
 
 public class TrajectoryAction implements Action{
 
@@ -47,5 +48,6 @@ public class TrajectoryAction implements Action{
 
 	@Override
 	public void done() {
+		mDrive.setState(State.OFF);
 	}
 }

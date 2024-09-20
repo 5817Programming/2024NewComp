@@ -38,6 +38,7 @@ import com.uni.lib.swerve.SwerveKinematics;
 import com.uni.lib.swerve.SwerveModuleState;
 import com.uni.lib.util.Util;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -272,7 +273,7 @@ boolean mOverrideTrajectory = false;
 			wanted_speeds = new ChassisSpeeds(twist_vel.dx, twist_vel.dy, twist_vel.dtheta);
 		}
 
-		SwerveModuleState[] real_module_setpoints = inverseKinematics.toModuleStates(wanted_speeds);
+		SwerveModuleState[] real_module_setpoints = inverseKinematics.toModuleStates(wanted_speeds, getRobotHeading());
 		SwerveKinematics.desaturateWheelSpeeds(real_module_setpoints, Constants.SwerveMaxspeedMPS);
 
         return real_module_setpoints;
@@ -471,8 +472,9 @@ boolean mOverrideTrajectory = false;
         gyro.setAngle(0);
         resetPose(new Pose2d(new Translation2d(1.9, 4.52), Rotation2d.fromDegrees(0)));
     }
-        public boolean isTrajectoryFinished() {
-        return mDriveMotionPlanner.isFinished();
+    public boolean isTrajectoryFinished() {
+        Logger.recordOutput("Trajectory Error", mDriveMotionPlanner.getEndPosition().getTranslation().translateBy(poseMeters.getTranslation().inverse()).norm());
+         return mDriveMotionPlanner.getEndPosition().getTranslation().translateBy(poseMeters.getTranslation().inverse()).norm() < Units.inchesToMeters(8);
     }
 
     
@@ -540,10 +542,10 @@ boolean mOverrideTrajectory = false;
 
     @Override
     public void outputTelemetry() {
-        Logger.recordOutput("State", getState());
+        Logger.recordOutput("Swerve/State", getState());
         modules.forEach((m) -> m.outputTelemetry());
-        Logger.recordOutput("Heading", getRobotHeading().getDegrees());
-        Logger.recordOutput("DesiredHeading", headingController.getTargetHeading());
+        Logger.recordOutput("Swerve/Heading", getRobotHeading().getDegrees());
+        Logger.recordOutput("Swerve/DesiredHeading", headingController.getTargetHeading());
     }
 
     @Override

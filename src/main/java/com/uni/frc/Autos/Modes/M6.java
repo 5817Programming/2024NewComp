@@ -23,19 +23,19 @@ public class M6 extends AutoBase {
     SuperStructure s = SuperStructure.getInstance();
     SwerveDrive mSwerve = SwerveDrive.getInstance();
     double initRotation = 1;
-    PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory("M6");
+    PathPlannerPath path = PathPlannerPath.fromPathFile("StartToClose1");
+    PathPlannerPath path1 = PathPlannerPath.fromPathFile("close1 to close 2");
     
     PathPlannerTrajectory trajectory = addTrajectory(path.getTrajectory(new ChassisSpeeds(), Rotation2d.fromDegrees(initRotation)));
+    PathPlannerTrajectory trajectory1 = addTrajectory(path1.getTrajectory(new ChassisSpeeds(), Rotation2d.fromDegrees(initRotation)));
 
     @Override
     public void routine() {
         runAction(new ParallelAction(List.of(
-                                        new TrajectoryAction(trajectory),
-                                        new SeriesAction(
-                                                            // new WaitAction(1),
-                                                            // new LambdaAction(()-> s.intakeState())
-                                        //                     new WaitAction(1),
-                                        //                     new LambdaAction(()-> s.shootState(false))
-                                        ))
+            new LambdaAction(()->s.intakeState(1)),
+            new SeriesAction(
+            new TrajectoryAction(trajectory),
+            new LambdaAction(()->s.shootState(true)))
+        )
         ));
     }}

@@ -113,6 +113,7 @@ public class Robot extends LoggedRobot {
   
     @Override
     public void autonomousInit() {
+      RobotStateEstimator.getInstance().resetOdometry(new Pose2d(15.18,5.48,Rotation2d.kIdentity));
       auto = autoChooser.get();
       swerve = SwerveDrive.getInstance();
       swerve.fieldzeroSwerve();

@@ -80,11 +80,12 @@ public class Constants {
     public static final Translation2d mRearRightPosition = new Translation2d(-mRobotBaseWidth / 2,
             mRobotBaseLength / 2);
     public static final Translation2d[] mModulePositions = {
-			new Translation2d(mRobotBaseLength / 2.0, mRobotBaseWidth / 2.0),
-			new Translation2d(mRobotBaseLength / 2.0, -mRobotBaseWidth / 2.0),
+		
 			new Translation2d(-mRobotBaseLength / 2.0, mRobotBaseWidth / 2.0),
-			new Translation2d(-mRobotBaseLength / 2.0, -mRobotBaseWidth / 2.0)
-		};
+            new Translation2d(-mRobotBaseLength / 2.0, -mRobotBaseWidth / 2.0),
+			new Translation2d(mRobotBaseLength / 2.0, -mRobotBaseWidth / 2.0),
+			new Translation2d(mRobotBaseLength / 2.0, mRobotBaseWidth / 2.0),
+	};
 
 
     public static final List<Translation2d> kModulePositions = Arrays.asList(kFrontRightPosition, kFrontLeftPosition,

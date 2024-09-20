@@ -145,7 +145,7 @@ public class SwerveKinematics {
                 chassisSpeedsVector.get(2, 0));
     }
     	@SuppressWarnings("PMD.MethodReturnsInternalArray")
-	public SwerveModuleState[] toModuleStates(ChassisSpeeds chassisSpeeds, Translation2d centerOfRotationMeters) {
+	public SwerveModuleState[] toModuleStates(ChassisSpeeds chassisSpeeds, Translation2d centerOfRotationMeters, Rotation2d robotHeading) {
 		if (chassisSpeeds.vxMetersPerSecond == 0.0
 				&& chassisSpeeds.vyMetersPerSecond == 0.0
 				&& chassisSpeeds.omegaRadiansPerSecond == 0.0) {
@@ -183,7 +183,7 @@ public class SwerveKinematics {
 			double speed = Math.hypot(x, y);
 			Rotation2d angle = new Rotation2d(x, y, true);
 
-			mModuleStates[i] = new SwerveModuleState(speed, angle);
+			mModuleStates[i] = new SwerveModuleState(speed, angle.rotateBy(robotHeading.inverse()));
 		}
 
 		return mModuleStates;
@@ -196,7 +196,7 @@ public class SwerveKinematics {
 	 * @param chassisSpeeds The desired chassis speed.
 	 * @return An array containing the module states.
 	 */
-	public SwerveModuleState[] toModuleStates(ChassisSpeeds chassisSpeeds) {
-		return toModuleStates(chassisSpeeds, new Translation2d());
+	public SwerveModuleState[] toModuleStates(ChassisSpeeds chassisSpeeds, Rotation2d robotHeading) {
+		return toModuleStates(chassisSpeeds, new Translation2d(), robotHeading);
 	}
 }

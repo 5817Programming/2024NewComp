@@ -46,7 +46,7 @@ public class TalonConfigs {
 
     public static TalonFXConfiguration pivotConfigs() {
         TalonFXConfiguration driveConfigs = new TalonFXConfiguration();
-        driveConfigs.Slot0.kV = -25;
+        driveConfigs.Slot0.kV = -20;
         driveConfigs.Slot0.kS = 0;
         driveConfigs.Slot0.kA = 0;
         driveConfigs.Slot0.kP = -12;

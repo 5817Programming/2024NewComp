@@ -1,10 +1,12 @@
 package com.uni.frc.Planners;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.littletonrobotics.junction.Logger;
 
 import com.uni.frc.Constants;
+import com.uni.lib.HeadingController;
 import com.uni.lib.geometry.Pose2d;
 import com.uni.lib.geometry.Rotation2d;
 import com.uni.lib.geometry.Translation2d;
@@ -14,6 +16,7 @@ import com.uni.lib.motion.PathPointState;
 import com.uni.lib.motion.TrajectoryIterator;
 import com.uni.lib.swerve.ChassisSpeeds;
 import com.uni.lib.util.ErrorTracker;
+import com.uni.lib.util.PID2d;
 import com.uni.lib.util.Util;
 
 public class DriveMotionPlanner {
@@ -29,7 +32,7 @@ public class DriveMotionPlanner {
 		PURE_PURSUIT,
 	}
 
-	FollowerType mFollowerType = FollowerType.PURE_PURSUIT;
+	FollowerType mFollowerType = FollowerType.PID;
 	public void setFollowerType(FollowerType type) {
 		mFollowerType = type;
 	}
@@ -49,6 +52,7 @@ public class DriveMotionPlanner {
 	Pose2d mError = Pose2d.identity();
 
 	ErrorTracker mErrorTracker = new ErrorTracker(14 * 100);
+	HeadingController mHeadingController = new HeadingController();
 	Translation2d mTranslationalError = Translation2d.identity();
 	Rotation2d mPrevHeadingError = Rotation2d.identity();
 	Pose2d mCurrentState = Pose2d.identity();
@@ -90,14 +94,14 @@ public class DriveMotionPlanner {
 
 	protected ChassisSpeeds updatePIDChassis(ChassisSpeeds chassisSpeeds) {
 		// Feedback on longitudinal error (distance).
-		// final double kPathk =
-		// 		1.7; // 2.4;/* * Math.ypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond)*/;//0.15;
-		// final double kPathKTheta = 3.0;
-		// Twist2d pid_error = Pose2d.log(mError);
-		// Logger.recordOutput("Error", mError.toWPI());
-		// chassisSpeeds.vxMetersPerSecond = chassisSpeeds.vxMetersPerSecond - kPathk * pid_error.dx;
-		// chassisSpeeds.vyMetersPerSecond = chassisSpeeds.vyMetersPerSecond + kPathk * pid_error.dy;
-		// chassisSpeeds.omegaRadiansPerSecond = chassisSpeeds.omegaRadiansPerSecond + kPathKTheta * pid_error.dtheta;
+		final double kPathk =
+			1; 
+			// 2.4;/* * Math.ypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond)*/;//0.15;
+		Twist2d pid_error = Pose2d.log(mError);
+		Logger.recordOutput("Error", mError.toWPI());
+		chassisSpeeds.vxMetersPerSecond = (chassisSpeeds.vxMetersPerSecond * .8) - kPathk * pid_error.dx;
+		chassisSpeeds.vyMetersPerSecond = (chassisSpeeds.vyMetersPerSecond* .5) + kPathk * pid_error.dy;
+		chassisSpeeds.omegaRadiansPerSecond = mHeadingController.getVelocityCorrection(mError.getRotation().getDegrees(), Timer.getFPGATimestamp());
 		return chassisSpeeds;
 	}
 
@@ -196,7 +200,6 @@ public class DriveMotionPlanner {
 		PathPointState sample_point;
 		mCurrentState = current_state;
 
-		if (!isFinished()) {
 			// Compute error in robot frame
 			mPrevHeadingError = mError.getRotation();
 			mError = current_state.inverse().transformBy(mSetpoint.getPose());
@@ -206,8 +209,9 @@ public class DriveMotionPlanner {
 
 
             switch (mFollowerType) {
-                case PURE_PURSUIT:
+				case PID:
  				sample_point = mCurrentTrajectory.advance(mDt/2);
+				System.out.println("Ran");
 				// RobotState.getInstance().setDisplaySetpointPose(Pose2d.fromTranslation(RobotState.getInstance().getFieldToOdom(timestamp)).transformBy(sample_point.state().state().getPose()));
 				mSetpoint = sample_point;
                 Logger.recordOutput("desired path Point", sample_point.getPose().toWPI());
@@ -219,18 +223,14 @@ public class DriveMotionPlanner {
 				// Adjust course by ACTUAL heading rather than planned to decouple heading and translation errors.
 
 				var chassis_speeds = new ChassisSpeeds(
-					0,0,4
-						// motion_direction.cos() * velocity_m,
-						// motion_direction.sin() * velocity_m,
-						// mSetpoint.getHeadingRate() * 2 * Math.PI
+						motion_direction.cos() * velocity_m,
+						motion_direction.sin() * velocity_m,
+						0
 						);
-						// Need unit conversion because Pose2dWithMotion heading rate is per unit distance.
-						// velocity_m * mSetpoint.getHeadingRate());
-				// PID is in robot frame
-					mOutput = updatePIDChassis(chassis_speeds);
+				mOutput = updatePIDChassis(chassis_speeds);
 	                   
                     break;
-                case PID:
+                case PURE_PURSUIT:
  				double searchStepSize = 1.0;
 				double previewQuantity = 0.0;
 				double searchDirection = 1.0;
@@ -258,17 +258,11 @@ public class DriveMotionPlanner {
 	                   
                     break;
             }
-		} else {
-			if (mCurrentTrajectory.getTimeView().sample(mCurrentTrajectoryLength).getVelocity() == 0.0) {
-				mOutput = new ChassisSpeeds();
-			}
-		}
-
 		return mOutput;
 	}
 
-	public boolean isFinished() {
-		return mCurrentTrajectory != null && mCurrentTrajectory.isDone();
+	public Pose2d getEndPosition() {
+		return mCurrentTrajectory.getTimeView().sample(mCurrentTrajectoryLength).getPose();
 	}
 
 	public synchronized Translation2d getTranslationalError() {

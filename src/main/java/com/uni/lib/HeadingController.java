@@ -21,9 +21,11 @@ public class HeadingController {
         isDisabled = disable;
     }
 
-    private SynchronousPIDF pidController;
+    private SynchronousPIDF openLoopController;
+    private SynchronousPIDF velocityController;
     public HeadingController() {
-        pidController = new SynchronousPIDF(0.0004, 0.0, 0, 0.0);
+        openLoopController = new SynchronousPIDF(0.0004, 0.0, 0, 0.0);
+        velocityController = new SynchronousPIDF(0.1, 0.0, 0, 0.0);
     }
     public void setTargetHeading(Rotation2d heading) {
         targetHeading = Rotation2d.fromDegrees(heading.getDegrees());
@@ -51,12 +53,23 @@ public class HeadingController {
         if(Math.abs(error)< 2.5){
             atTarget = true;
         }
-        double correctionForce = pidController.calculate(error, dt);
+        double correctionForce = openLoopController.calculate(error, dt);
         if(Math.abs(correctionForce) > 0.017){
             correctionForce = .0075* Math.signum(correctionForce);
         }
         return correctionForce;
     }
+
+    public double getVelocityCorrection(double error, double timestamp) {
+        double dt = timestamp - lastTimestamp;
+        lastTimestamp = timestamp;
+        if(Math.abs(error)< 3){
+            atTarget = true;
+        }
+        double correctionForce = velocityController.calculate(error, dt);
+       return correctionForce;
+    }
+
     public double getTargetHeading(){
         return targetHeading.getDegrees();
     }
