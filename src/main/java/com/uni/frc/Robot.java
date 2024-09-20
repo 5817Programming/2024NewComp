@@ -36,13 +36,11 @@ import com.uni.frc.subsystems.Vision.OdometryLimeLight;
 import com.uni.frc.subsystems.gyros.Gyro;
 import com.uni.lib.geometry.Pose2d;
 import com.uni.lib.geometry.Rotation2d;
-import com.uni.lib.motion.PathStateGenerator;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 public class Robot extends LoggedRobot {
 
@@ -116,12 +114,11 @@ public class Robot extends LoggedRobot {
       RobotStateEstimator.getInstance().resetOdometry(new Pose2d(15.18,5.48,Rotation2d.kIdentity));
       auto = autoChooser.get();
       swerve = SwerveDrive.getInstance();
-      swerve.fieldzeroSwerve();
+      swerve.fieldZeroSwerve();
       swerve.zeroModules();
       SuperStructure.getInstance().setState(SuperState.AUTO);
       mEnabledLooper.start();
       mDisabledLooper.stop();
-
       autoExecuter.setAuto(new M6());
       autoExecuter.start();
     }

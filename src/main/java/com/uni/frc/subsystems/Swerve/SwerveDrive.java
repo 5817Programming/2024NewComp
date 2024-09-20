@@ -440,7 +440,7 @@ boolean mOverrideTrajectory = false;
         headingController.setTargetHeading(Rotation2d.fromDegrees(r));
     }
 
-    public void fieldzeroSwerve() {// starts the zero 180 off
+    public void fieldZeroSwerve() {// starts the zero 180 off
         headingController.setTargetHeading(Rotation2d.fromDegrees(0));
         gyro.setAngle(180);
         if (DriverStation.getAlliance().get().equals(Alliance.Blue)) {
