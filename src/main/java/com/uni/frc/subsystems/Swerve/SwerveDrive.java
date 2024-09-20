@@ -240,21 +240,23 @@ boolean mOverrideTrajectory = false;
         }
     }
 
-    public void commandModulesWithStates(SwerveModuleState[] moduleVectors) {
-
-        for (int i = 0; i < moduleVectors.length; i++) {
-            if (Util.shouldReverse(moduleVectors[i].angle,
+    public void commandModulesVelocity(List<Translation2d> moduleVectors) {
+        this.moduleVectors = moduleVectors;
+        for (int i = 0; i < moduleVectors.size(); i++) {
+            if (Util.shouldReverse(moduleVectors.get(i).direction(),
                     Rotation2d.fromDegrees(modules.get(i).getModuleAngle()))) {
-                modules.get(i).setModuleAngle(moduleVectors[i].angle.getDegrees() + 180);
-                modules.get(i).setDriveVelocity(-moduleVectors[i].speedMetersPerSecond);
+                modules.get(i).setModuleAngle(moduleVectors.get(i).direction().getDegrees() + 180);
+                modules.get(i).setDriveVelocity(-moduleVectors.get(i).norm());
             } else {
-                modules.get(i).setModuleAngle(moduleVectors[i].angle.getDegrees());
-                modules.get(i).setDriveVelocity(moduleVectors[i].speedMetersPerSecond); 
+                modules.get(i).setModuleAngle(moduleVectors.get(i).direction().getDegrees());
+                modules.get(i).setDriveOpenLoop(moduleVectors.get(i).norm());
 
             }
         }
     }
-    	private SwerveModuleState[] updatePathFollowingSetpoint(ChassisSpeeds des_chassis_speeds) {
+
+
+    	private List<Translation2d> updatePathFollowingSetpoint(ChassisSpeeds des_chassis_speeds) {
 
 		Pose2d robot_pose_vel = new Pose2d(
 				des_chassis_speeds.vxMetersPerSecond * Constants.kLooperDt * 4.0,
@@ -272,11 +274,7 @@ boolean mOverrideTrajectory = false;
 		} else {
 			wanted_speeds = new ChassisSpeeds(twist_vel.dx, twist_vel.dy, twist_vel.dtheta);
 		}
-
-		SwerveModuleState[] real_module_setpoints = inverseKinematics.toModuleStates(wanted_speeds, getRobotHeading());
-		SwerveKinematics.desaturateWheelSpeeds(real_module_setpoints, Constants.SwerveMaxspeedMPS);
-
-        return real_module_setpoints;
+        return inverseKinematics.updateDriveVectors(new Translation2d(wanted_speeds.vxMetersPerSecond, wanted_speeds.vyMetersPerSecond), wanted_speeds.omegaRadiansPerSecond, poseMeters, robotCentric);
 	}
 
    
@@ -372,8 +370,8 @@ boolean mOverrideTrajectory = false;
                             setState(State.MANUAL);
                         }
                         ChassisSpeeds desPathSpeed = updatePathFollower(poseMeters);
-                        SwerveModuleState[] real_module_setpoints = updatePathFollowingSetpoint(desPathSpeed);
-                        commandModulesWithStates(real_module_setpoints);
+                        List<Translation2d> real_module_setpoints = updatePathFollowingSetpoint(desPathSpeed);
+                        commandModulesVelocity(real_module_setpoints);
                        break;
                     case TARGETOBJECT:
                         rotationCorrection = mTargetPiecePlanner.updateAiming(timestamp,
