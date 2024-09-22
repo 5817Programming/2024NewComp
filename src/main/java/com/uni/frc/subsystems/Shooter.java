@@ -37,7 +37,7 @@ import com.uni.lib.TalonConfigs;
     TRANSFER(0.3),
     REVERSETRANSFER(-.5),
     AMP(.5),
-    IDLE(0);
+    IDLE(.1);
 
     double output = 0;
     State(double output){

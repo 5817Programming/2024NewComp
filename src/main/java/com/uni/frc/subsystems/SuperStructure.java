@@ -291,8 +291,11 @@ public class SuperStructure extends Subsystem {
                 mArm.stop();
                 break;
             case AUTO:
-                if (continuousShoot)
-                    prepareShooterSetpoints(timestamp);
+                if (continuousShoot){
+                   prepareShooterSetpoints(timestamp);
+                    stateChanged = false;
+                }
+
                 break;
 
         }
@@ -396,7 +399,7 @@ public class SuperStructure extends Subsystem {
 
     public void prepareShooterSetpoints(double timestamp) {
         ShootingParameters shootingParameters = getShootingParams(mRobotState.getKalmanPose(timestamp));
-        Logger.recordOutput("Desired Pivot Angle", shootingParameters.compensatedDesiredPivotAngle);
+        // Logger.recordOutput("Desired Pivot Angle", shootingParameters.compensatedDesiredPivotAngle);
         mShooter.conformToState(Shooter.State.SHOOTING);
         mPivot.conformToState(shootingParameters.compensatedDesiredPivotAngle - 1);
         mShooter.setSpin(Constants.ShooterConstants.SPIN);
@@ -553,12 +556,11 @@ public class SuperStructure extends Subsystem {
     public void intakeState(double timeout) {
         RequestList request = new RequestList(Arrays.asList(
                 logCurrentRequest("Intaking"),
-                mDrive.setModeRequest(TrajectoryMode.TRACKING),
+                mIndexer.setHasPieceRequest(false),
                 mLights.setColorRequest(Color.INTAKING),
                 mIntake.stateRequest(Intake.State.INTAKING),
                 mIndexer.stateRequest(Indexer.State.RECIEVING),
                 mIndexer.hasPieceRequest(timeout),
-                mDrive.setModeRequest(TrajectoryMode.FOLLOWING),
                 mLights.setColorRequest(Color.INTAKED),
                 mIndexer.stateRequest(Indexer.State.OFF),
                 mIntake.stateRequest(Intake.State.OFF),

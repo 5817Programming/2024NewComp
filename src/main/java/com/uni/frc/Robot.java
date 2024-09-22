@@ -55,7 +55,6 @@ public class Robot extends LoggedRobot {
     AutoBase auto = new M6();
     public LoggedDashboardChooser<AutoBase> autoChooser = new LoggedDashboardChooser<>("AutoChooser");
     private final Looper mEnabledLooper = new Looper();
-    private final Looper mDisabledLooper = new Looper();
   
   HashMap<String,AutoBase> autos = new HashMap<String,AutoBase>();
     @Override
@@ -97,7 +96,6 @@ public class Robot extends LoggedRobot {
           Arm.getInstance()
           );
           mSubsystemManager.registerEnabledLoops(mEnabledLooper);
-          mSubsystemManager.registerDisabledLoops(mDisabledLooper);
       }
   
     @Override
@@ -111,14 +109,12 @@ public class Robot extends LoggedRobot {
   
     @Override
     public void autonomousInit() {
-      RobotStateEstimator.getInstance().resetOdometry(new Pose2d(15.18,5.48,Rotation2d.kIdentity));
       auto = autoChooser.get();
       swerve = SwerveDrive.getInstance();
-      swerve.fieldZeroSwerve();
+      swerve.resetGryo(OdometryLimeLight.getInstance().getMovingAverageHeading());
       swerve.zeroModules();
       SuperStructure.getInstance().setState(SuperState.AUTO);
       mEnabledLooper.start();
-      mDisabledLooper.stop();
       autoExecuter.setAuto(new M6());
       autoExecuter.start();
     }
@@ -132,7 +128,6 @@ public class Robot extends LoggedRobot {
     @Override
     public void teleopInit() {
       mEnabledLooper.start();
-      mDisabledLooper.stop();
       swerve = SwerveDrive.getInstance();
       // swerve.fieldzeroSwerve();
       swerve.zeroModules();
@@ -150,10 +145,10 @@ public class Robot extends LoggedRobot {
   
     @Override
     public void disabledInit() {
+      OdometryLimeLight.getInstance().resetMovingAverageHeading();
       mSubsystemManager.stop();
       SuperStructure.getInstance().clearQueues();
       mEnabledLooper.stop();
-      mDisabledLooper.start();
       autoExecuter.stop();
       autoExecuter = new AutoExecuter();
     }
@@ -161,7 +156,8 @@ public class Robot extends LoggedRobot {
     /** This function is called periodically when disabled. */
     @Override
     public void disabledPeriodic() {
-      
+      RobotState.getInstance().outputTelemetry();
+      OdometryLimeLight.getInstance().readInputsAndAddVisionUpdate();
   
     }
   

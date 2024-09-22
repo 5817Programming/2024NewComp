@@ -1,6 +1,8 @@
 package com.uni.frc.Planners;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.littletonrobotics.junction.Logger;
@@ -95,13 +97,17 @@ public class DriveMotionPlanner {
 	protected ChassisSpeeds updatePIDChassis(ChassisSpeeds chassisSpeeds) {
 		// Feedback on longitudinal error (distance).
 		final double kPathk =
-			1; 
+			DriverStation.getAlliance().get() == Alliance.Blue? 3:-3; 
 			// 2.4;/* * Math.ypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond)*/;//0.15;
 		Twist2d pid_error = Pose2d.log(mError);
 		Logger.recordOutput("Error", mError.toWPI());
-		chassisSpeeds.vxMetersPerSecond = (chassisSpeeds.vxMetersPerSecond * .8) - kPathk * pid_error.dx;
-		chassisSpeeds.vyMetersPerSecond = (chassisSpeeds.vyMetersPerSecond* .5) + kPathk * pid_error.dy;
-		chassisSpeeds.omegaRadiansPerSecond = mHeadingController.getVelocityCorrection(mError.getRotation().getDegrees(), Timer.getFPGATimestamp());
+		chassisSpeeds.vxMetersPerSecond = (chassisSpeeds.vxMetersPerSecond * 1) - kPathk * pid_error.dx;
+		chassisSpeeds.vyMetersPerSecond = (chassisSpeeds.vyMetersPerSecond * .8) + kPathk * pid_error.dy;
+		// chassisSpeeds.vxMetersPerSecond = (chassisSpeeds.vxMetersPerSecond * 1) ;
+		// chassisSpeeds.vyMetersPerSecond = (chassisSpeeds.vyMetersPerSecond * 1) ;
+	
+		chassisSpeeds.omegaRadiansPerSecond = mHeadingController.getVelocityCorrection(-mError.getRotation().getDegrees(), Timer.getFPGATimestamp());
+		// chassisSpeeds.omegaRadiansPerSecond = 0;
 		return chassisSpeeds;
 	}
 
@@ -223,8 +229,8 @@ public class DriveMotionPlanner {
 				// Adjust course by ACTUAL heading rather than planned to decouple heading and translation errors.
 
 				var chassis_speeds = new ChassisSpeeds(
-						motion_direction.cos() * velocity_m,
-						motion_direction.sin() * velocity_m,
+						velocity_m * motion_direction.cos(),
+						velocity_m * motion_direction.sin(),
 						0
 						);
 				mOutput = updatePIDChassis(chassis_speeds);

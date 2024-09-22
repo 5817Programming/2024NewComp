@@ -108,7 +108,7 @@ public class Constants {
     public static final double driveKA = (0.27 / 12);
 
     public static final double kSwerveMaxspeedMPS = 10;
-    public static final double SwerveMaxspeedMPS = 120;
+    public static final double SwerveMaxspeedMPS = 4;
     public static final double kSwerveDriveMaxSpeed = 22000.0; // The theoretical max speed(For the Falcon 500s)
     public static final double kSwerveRotation10VoltMaxSpeed = 1350.0;
 
@@ -119,7 +119,7 @@ public class Constants {
     public static final double kSwerveWheelReduction = Options.driveRatio; // The Wheel to Motor Ratio(i.e, amount the
                                                                            // drive motor rotates, for every one
                                                                            // rotation for the wheel)
-    public static final double kSwerveRotationEncoderResolution = 2048.0;
+    public static final double derResolution = 2048.0;
     public static final double kSwerveDriveEncoderResolution = 2048.0;
 
     public static final double kSwerveWheelDiameter = 4; // inches
@@ -152,7 +152,7 @@ public class Constants {
 
     public static final boolean tuningMode = true;
 
-    public static final boolean disableExtraTelemetry = false;
+    public static final boolean disableExtraTelemetry = true;
 
 public static final double kLooperDt = 0.02;
 
@@ -229,18 +229,13 @@ public static final double kLooperDt = 0.02;
 
         public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> SpeakerAngleMap = new InterpolatingTreeMap<>();
         static {
-            SpeakerAngleMap.put(new InterpolatingDouble(1.36), new InterpolatingDouble(23.5));//
-            SpeakerAngleMap.put(new InterpolatingDouble(1.77), new InterpolatingDouble(18.5));//
-            SpeakerAngleMap.put(new InterpolatingDouble(2.31), new InterpolatingDouble(11.5));//
-            SpeakerAngleMap.put(new InterpolatingDouble(2.57), new InterpolatingDouble(10.5));//
-            SpeakerAngleMap.put(new InterpolatingDouble(3.17), new InterpolatingDouble(6.0));//
-            SpeakerAngleMap.put(new InterpolatingDouble(3.46), new InterpolatingDouble(4.5));//
-            SpeakerAngleMap.put(new InterpolatingDouble(3.75), new InterpolatingDouble(4.0));//
-            SpeakerAngleMap.put(new InterpolatingDouble(4.0), new InterpolatingDouble(3.0));//
-            SpeakerAngleMap.put(new InterpolatingDouble(4.3), new InterpolatingDouble(2.0));//
-            SpeakerAngleMap.put(new InterpolatingDouble(4.79), new InterpolatingDouble(1.0));//
-            SpeakerAngleMap.put(new InterpolatingDouble(5.25), new InterpolatingDouble(.5));//
-           SpeakerAngleMap.put(new InterpolatingDouble(6.16), new InterpolatingDouble(0.0));//
+            SpeakerAngleMap.put(new InterpolatingDouble(1.1), new InterpolatingDouble(26.5));
+            SpeakerAngleMap.put(new InterpolatingDouble(2.11), new InterpolatingDouble(16.0));
+            SpeakerAngleMap.put(new InterpolatingDouble(3.06), new InterpolatingDouble(7.75));
+            SpeakerAngleMap.put(new InterpolatingDouble(3.63), new InterpolatingDouble(7.75));
+
+            SpeakerAngleMap.put(new InterpolatingDouble(4.3), new InterpolatingDouble(2.75));
+            SpeakerAngleMap.put(new InterpolatingDouble(5.0), new InterpolatingDouble(1.0));
 
        }
         public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> LobAngleMap = new InterpolatingTreeMap<>();

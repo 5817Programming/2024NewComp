@@ -93,6 +93,23 @@ public class SwerveKinematics {
         return driveVectors;
         
     }
+    public List<Translation2d> updateDriveVectorsVelocity(Translation2d translationVector, double rotationalMagnitude, Pose2d robotPosition, boolean robotCentric) {
+        List<Translation2d> driveVectors = new ArrayList<>(m_numModules);
+        if(!robotCentric)
+            translationVector = translationVector.rotateBy(robotPosition.getRotation().inverse()); //Rotates by the translation vector by inverse rotation of the robot 
+        for(int i = 0; i < m_numModules; i++) {
+            driveVectors.add(translationVector.translateBy(moduleRotationVectors.get(i).scale(rotationalMagnitude))); //Rotates the translation vector of each of the modules, by the rotation value
+        }
+
+    //     double maxMagnitude = Constants.SwerveMaxspeedMPS;
+    //    for (int i =0; i< m_numModules; i++) {
+    //         Translation2d driveVector = driveVectors.get(i);
+    //         driveVectors.set(i, driveVector.scale(1.0/maxMagnitude));
+    //     }
+        return driveVectors;
+        
+    }
+
 
     public static void desaturateWheelSpeeds(
 			SwerveModuleState[] moduleStates, double attainableMaxSpeedMetersPerSecond) {

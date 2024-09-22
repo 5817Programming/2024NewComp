@@ -28,6 +28,7 @@ import com.uni.lib.Vision.UndistortMap;
 import com.uni.lib.geometry.Pose2d;
 import com.uni.lib.geometry.Rotation2d;
 import com.uni.lib.geometry.Translation2d;
+import com.uni.lib.util.MovingAverage;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
@@ -48,7 +49,7 @@ public class OdometryLimeLight extends Subsystem {
   private Mat mDistortionCoeffients = new Mat(1, 5, CV_64FC1);
 
   private boolean mOutputsHaveChanged = true;
-
+  private MovingAverage movingAverage = new MovingAverage(100);
   private static HashMap<Integer, AprilTag> mTagMap = FieldLayout.Red.kAprilTagMap;
 
   public static OdometryLimeLight getInstance() {
@@ -95,7 +96,7 @@ public class OdometryLimeLight extends Subsystem {
     }
   }
 
-  private void readInputsAndAddVisionUpdate() {
+  public void readInputsAndAddVisionUpdate() {
     final double timestamp = Timer.getFPGATimestamp();
     mPeriodicIO.imageCaptureLatency = table.getEntry("cl").getDouble(Constants.VisionConstants.IMAGE_CAPTURE_LATENCY);
     mPeriodicIO.latency = table.getEntry("tl").getDouble(0) / 1000.0 + mPeriodicIO.imageCaptureLatency / 1000.0;
@@ -108,6 +109,8 @@ public class OdometryLimeLight extends Subsystem {
     mPeriodicIO.ta = table.getEntry("ta").getDouble(0);
     LimelightHelpers.SetRobotOrientation("limelight-up", 180-Pigeon.getInstance().getAngle(), 0, 0, 0, 0, 0);
     Pose2d mt2 = new Pose2d(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-up").pose);
+    Pose2d mt = new Pose2d(LimelightHelpers.getBotPose2d_wpiBlue("limelight-up"));
+    movingAverage.addNumber(mt.getRotation().flip().getDegrees());
 
     int tagId = mPeriodicIO.tagId;
 
@@ -130,6 +133,16 @@ public class OdometryLimeLight extends Subsystem {
       mPeriodicIO.useVision = useVision;
     }
   }
+
+  public double getMovingAverageHeading(){
+    return movingAverage.getAverage();
+  }
+
+  public void resetMovingAverageHeading(){
+    movingAverage = new MovingAverage(100);
+  }
+
+
 
   public Optional<VisionUpdate> getLatestVisionUpdate() {
     return mPeriodicIO.visionUpdate;

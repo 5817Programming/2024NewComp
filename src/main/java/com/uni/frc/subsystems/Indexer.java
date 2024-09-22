@@ -152,7 +152,8 @@ import edu.wpi.first.wpilibj.Timer;
 
       @Override
       public boolean isFinished() {
-        return mPeriodicIO.hasPiece || Timer.getFPGATimestamp() - startTime > timeout;
+        // return false;
+        return Timer.getFPGATimestamp() - startTime > timeout;
       }
     };
   }
@@ -197,7 +198,7 @@ import edu.wpi.first.wpilibj.Timer;
     return new Request() {
       @Override
       public void act() {
-            mPeriodicIO.hasPiece = hasPiece;
+            // mPeriodicIO.hasPiece = hasPiece;
       }
     };
   }

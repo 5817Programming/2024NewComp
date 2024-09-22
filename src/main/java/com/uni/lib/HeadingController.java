@@ -24,8 +24,8 @@ public class HeadingController {
     private SynchronousPIDF openLoopController;
     private SynchronousPIDF velocityController;
     public HeadingController() {
-        openLoopController = new SynchronousPIDF(0.0004, 0.0, 0, 0.0);
-        velocityController = new SynchronousPIDF(0.1, 0.0, 0, 0.0);
+        openLoopController = new SynchronousPIDF(0.0002, 0.0, 0, 1.0);
+        velocityController = new SynchronousPIDF(0.001, 0.0, 0, 100);
     }
     public void setTargetHeading(Rotation2d heading) {
         targetHeading = Rotation2d.fromDegrees(heading.getDegrees());

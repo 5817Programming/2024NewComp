@@ -9,6 +9,7 @@ import com.uni.lib.geometry.Rotation2d;
 import com.uni.lib.geometry.Translation2d;
 import com.uni.lib.geometry.Twist2d;
 
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -37,17 +38,17 @@ public class TimeView {
 
         Pose2d pose = new Pose2d(new Translation2d(state.positionMeters), new Rotation2d(state.targetHolonomicRotation).inverse());
         double headingRate = 0;
-
+        double velocity = state.velocityMps;
         double curvature = state.curvatureRadPerMeter;
-        Rotation2d motion_direction = new Rotation2d(state.heading);
+        Rotation2d motion_direction = new Rotation2d(state.heading).flip().inverse();
         if(DriverStation.getAlliance().get() == Alliance.Red){
             pose = pose.mirrorAboutX(8.25);
             headingRate *= -1;
-            motion_direction = motion_direction.flip();
+            motion_direction = motion_direction.inverse();
+            velocity *= -1;
         }
 
-
-        return new PathPointState(pose, motion_direction, curvature, state.velocityMps, state.accelerationMpsSq, t, headingRate);
+        return new PathPointState(pose, motion_direction, curvature, velocity, state.accelerationMpsSq, t, headingRate);
     }
 
     public PathPlannerTrajectory getTrajectory(){        

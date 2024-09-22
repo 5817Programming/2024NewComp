@@ -253,7 +253,7 @@ boolean mOverrideTrajectory = false;
                 modules.get(i).setDriveVelocity(-moduleVectors.get(i).norm());
             } else {
                 modules.get(i).setModuleAngle(moduleVectors.get(i).direction().getDegrees());
-                modules.get(i).setDriveOpenLoop(moduleVectors.get(i).norm());
+                modules.get(i).setDriveVelocity(moduleVectors.get(i).norm());
 
             }
         }
@@ -269,16 +269,16 @@ boolean mOverrideTrajectory = false;
 						des_chassis_speeds.omegaRadiansPerSecond * Constants.kLooperDt * 4.0));
 		Twist2d twist_vel = Pose2d.log(robot_pose_vel).scaled(1.0 / (4.0 * Constants.kLooperDt));
 
-		ChassisSpeeds wanted_speeds;
-		if (mOverrideHeading) {
-			headingController.setTargetHeading(mTrackingAngle.inverse());
-			double new_omega = headingController.getRotationCorrection(getRobotHeading().inverse().flip(), Timer.getFPGATimestamp());
-			ChassisSpeeds speeds = new ChassisSpeeds(twist_vel.dx, twist_vel.dy, new_omega);
-			wanted_speeds = speeds;
-		} else {
-			wanted_speeds = new ChassisSpeeds(twist_vel.dx, twist_vel.dy, twist_vel.dtheta);
-		}
-        return inverseKinematics.updateDriveVectors(new Translation2d(wanted_speeds.vxMetersPerSecond, wanted_speeds.vyMetersPerSecond), wanted_speeds.omegaRadiansPerSecond, poseMeters, robotCentric);
+		// ChassisSpeeds wanted_speeds;
+		// if (mOverrideHeading) {
+		// 	headingController.setTargetHeading(mTrackingAngle.inverse());
+		// 	double new_omega = headingController.getRotationCorrection(getRobotHeading().inverse().flip(), Timer.getFPGATimestamp());
+		// 	ChassisSpeeds speeds = new ChassisSpeeds(twist_vel.dx, twist_vel.dy, new_omega);
+		// 	wanted_speeds = speeds;
+		// } else {
+		// 	wanted_speeds = new ChassisSpeeds(twist_vel.dx, twist_vel.dy, twist_vel.dtheta);
+		// }
+        return inverseKinematics.updateDriveVectorsVelocity(new Translation2d(twist_vel.dx, twist_vel.dy), twist_vel.dtheta, Pose2d.fromRotation(getRobotHeading()), false);
 	}
 
    
@@ -381,8 +381,7 @@ boolean mOverrideTrajectory = false;
                         rotationCorrection = mTargetPiecePlanner.updateAiming(timestamp,
                                 objectVision.getLatestVisionUpdate(), headingController, getRobotHeading());
                         commandModules(
-                                inverseKinematics.updateDriveVectors(translationVector.scale(.5),
-                                        rotationCorrection * .7 + rotationScalar, drivingPose, robotCentric));
+                                inverseKinematics.updateDriveVectors(translationVector.scale(.5),rotationScalar, drivingPose, robotCentric));
                         break;
                     case AIMING:
                         Pose2d demandedAngle;
@@ -476,7 +475,7 @@ boolean mOverrideTrajectory = false;
     }
     public boolean isTrajectoryFinished() {
         Logger.recordOutput("Trajectory Error", mDriveMotionPlanner.getEndPosition().getTranslation().translateBy(poseMeters.getTranslation().inverse()).norm());
-         return mDriveMotionPlanner.getEndPosition().getTranslation().translateBy(poseMeters.getTranslation().inverse()).norm() < Units.inchesToMeters(8);
+         return mDriveMotionPlanner.getEndPosition().getTranslation().translateBy(poseMeters.getTranslation().inverse()).norm() < Units.inchesToMeters(4);
     }
 
     

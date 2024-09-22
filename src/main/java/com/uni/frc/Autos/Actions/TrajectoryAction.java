@@ -2,6 +2,8 @@ package com.uni.frc.Autos.Actions;
 
 
 import com.pathplanner.lib.path.PathPlannerTrajectory;
+import com.uni.frc.subsystems.RobotState;
+import com.uni.frc.subsystems.RobotStateEstimator;
 import com.uni.frc.subsystems.Swerve.SwerveDrive;
 import com.uni.frc.subsystems.Swerve.SwerveDrive.State;
 import com.uni.lib.geometry.Rotation2d;
@@ -30,8 +32,7 @@ public class TrajectoryAction implements Action{
 	@Override
 	public void start(){
 		if(mResetGyro){
-			Rotation2d init_rot = mTrajectory.getCurrentState().getPose().getRotation();
-			mDrive.resetGryo(init_rot.getDegrees());
+			RobotStateEstimator.getInstance().resetOdometry(mTrajectory.getCurrentState().getPose());
 		}
 		
 		mDrive.setTrajectory(mTrajectory);
