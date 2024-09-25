@@ -8,6 +8,8 @@ import com.uni.frc.Autos.Actions.ParallelAction;
 import com.uni.frc.Autos.Actions.SeriesAction;
 import com.uni.frc.Autos.Actions.TrajectoryAction;
 import com.uni.frc.Autos.Actions.WaitAction;
+import com.uni.frc.Autos.Actions.WaitForSuperstructureAction;
+import com.uni.frc.subsystems.Pivot;
 import com.uni.frc.subsystems.SuperStructure;
 import com.uni.frc.subsystems.Swerve.SwerveDrive;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -37,37 +39,34 @@ public class M6 extends AutoBase {
 
     @Override
     public void routine() {
-        // runAction(new ParallelAction(List.of(
-        //     new TrajectoryAction(trajectory),
-        //     new LambdaAction(() -> s.intakeState(3))
-        //     )));
-        // runAction(new WaitAction(3));
-        // runAction(new LambdaAction(() -> s.shootState(false)));
-        // runAction(new ParallelAction(List.of(
-        //     new TrajectoryAction(trajectory1),
-        //     new LambdaAction(() -> s.intakeState(3))
-        //     )));
-        // runAction(new WaitAction(3));
-        // runAction(new LambdaAction(() -> s.shootState(false)));
-        //  runAction(new ParallelAction(List.of(
-        //     new TrajectoryAction(trajectory2),
-        //     new LambdaAction(() -> s.intakeState(3))
-        //     )));
-        // runAction(new WaitAction(3));
-        // runAction(new LambdaAction(() -> s.shootState(false)));
-        runAction(new TrajectoryAction(trajectory, true));
-        runAction(new TrajectoryAction(trajectory1));
-        runAction(new TrajectoryAction(trajectory2));
-        runAction(new TrajectoryAction(trajectory3));
-        runAction(new TrajectoryAction(trajectory4));
-        // runAction(new ParallelAction(List.of(
-        //     new LambdaAction(()->s.intakeState(1)),
-        //     new SeriesAction(
-        //     new TrajectoryAction(trajectory),
-        //     new LambdaAction(()->s.shootState(true)))
-        // )
-        // ));
-        // runAction(new ParallelAction(List.of(
+        Pivot.getInstance().conformToState(Pivot.State.MAXUP);
+        runAction(new WaitAction(1));
+        runAction(new LambdaAction(() -> s.shootState(false)));
+        runAction(new WaitAction(1));
+        runAction(new ParallelAction(List.of(
+            new TrajectoryAction(trajectory),
+            new LambdaAction(() -> s.intakeState(2))
+            )));
+        runAction(new WaitAction(1));
+        runAction(new LambdaAction(() -> s.shootState(false)));
+        runAction(new WaitForSuperstructureAction(1));
+        runAction(new WaitAction(.5));
+        runAction(new ParallelAction(List.of(
+            new TrajectoryAction(trajectory1),
+            new LambdaAction(() -> s.intakeState(2))
+            )));
+        runAction(new WaitAction(1));
+        runAction(new LambdaAction(() -> s.shootState(false)));
+        runAction(new WaitForSuperstructureAction(1));
+        runAction(new WaitAction(.5));
+        runAction(new ParallelAction(List.of(
+            new TrajectoryAction(trajectory2),
+            new LambdaAction(() -> s.intakeSta))
+            )));
+        runAction(new WaitAction(1));
+        runAction(new LambdaAction(() -> s.shootState(false)));
+        runAction(new WaitForSuperstructureAction(1));
+       // runAction(new ParallelAction(List.of(
         //     new LambdaAction(()->s.intakeState(1)),
         //     new SeriesAction(
         //     new TrajectoryAction(trajectory1),

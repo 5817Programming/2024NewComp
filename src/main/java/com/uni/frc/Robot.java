@@ -158,7 +158,6 @@ public class Robot extends LoggedRobot {
     public void disabledPeriodic() {
       RobotState.getInstance().outputTelemetry();
       OdometryLimeLight.getInstance().readInputsAndAddVisionUpdate();
-  
     }
   
     /** This function is called once when test mode is enabled. */

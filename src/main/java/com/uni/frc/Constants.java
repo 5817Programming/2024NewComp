@@ -152,7 +152,7 @@ public class Constants {
 
     public static final boolean tuningMode = true;
 
-    public static final boolean disableExtraTelemetry = true;
+    public static final boolean disableExtraTelemetry = false;
 
 public static final double kLooperDt = 0.02;
 
@@ -175,8 +175,8 @@ public static final double kLooperDt = 0.02;
         }
         public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> SPEAKER_VELOCITY_TREE_MAP = new InterpolatingTreeMap<>();
         static {
-            SPEAKER_VELOCITY_TREE_MAP.put(new InterpolatingDouble(1.0), new InterpolatingDouble(1.0));
-            SPEAKER_VELOCITY_TREE_MAP.put(new InterpolatingDouble(6.0), new InterpolatingDouble(1.0));
+            SPEAKER_VELOCITY_TREE_MAP.put(new InterpolatingDouble(1.0), new InterpolatingDouble(.5));
+            SPEAKER_VELOCITY_TREE_MAP.put(new InterpolatingDouble(3.0), new InterpolatingDouble(1.0));
         }
         public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> LOB_VELOCITY_TREE_MAP = new InterpolatingTreeMap<>();
         static {
@@ -219,23 +219,22 @@ public static final double kLooperDt = 0.02;
 
     public static final class PivotConstants {
         public static final double SPEAKER = 0;
-        public static final double AMP = 25;
+        public static final double AMP = 12.5;
         public static final double TRAP = 0;
         public static final double TRANSFER = 0;
         public static final double SHOOTING = 0;
-        public static final double MAX_UP = 55;
+        public static final double MAX_UP = 26.5;
         public static final double MAX_DOWN = 0;
-        public static final double INTAKING = 10;
+        public static final double INTAKING = 5;
 
         public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> SpeakerAngleMap = new InterpolatingTreeMap<>();
-        static {
+        static{
             SpeakerAngleMap.put(new InterpolatingDouble(1.1), new InterpolatingDouble(26.5));
             SpeakerAngleMap.put(new InterpolatingDouble(2.11), new InterpolatingDouble(16.0));
-            SpeakerAngleMap.put(new InterpolatingDouble(3.06), new InterpolatingDouble(7.75));
-            SpeakerAngleMap.put(new InterpolatingDouble(3.63), new InterpolatingDouble(7.75));
-
-            SpeakerAngleMap.put(new InterpolatingDouble(4.3), new InterpolatingDouble(2.75));
-            SpeakerAngleMap.put(new InterpolatingDouble(5.0), new InterpolatingDouble(1.0));
+            SpeakerAngleMap.put(new InterpolatingDouble(2.9), new InterpolatingDouble(9.2));
+            SpeakerAngleMap.put(new InterpolatingDouble(3.63), new InterpolatingDouble(5.75));
+            SpeakerAngleMap.put(new InterpolatingDouble(4.3), new InterpolatingDouble(3.75));
+            SpeakerAngleMap.put(new InterpolatingDouble(5.0), new InterpolatingDouble(1.25));
 
        }
         public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> LobAngleMap = new InterpolatingTreeMap<>();

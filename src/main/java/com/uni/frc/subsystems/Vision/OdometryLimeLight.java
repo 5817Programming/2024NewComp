@@ -33,6 +33,7 @@ import com.uni.lib.util.MovingAverage;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 
 import static org.opencv.core.CvType.CV_64FC1;
@@ -113,7 +114,6 @@ public class OdometryLimeLight extends Subsystem {
     movingAverage.addNumber(mt.getRotation().flip().getDegrees());
 
     int tagId = mPeriodicIO.tagId;
-
     if (mPeriodicIO.seesTarget) {
       if (mt2 != Pose2d.identity() && mPeriodicIO.useVision) {
         mPeriodicIO.visionUpdate = Optional 

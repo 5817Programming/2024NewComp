@@ -90,7 +90,7 @@ public class SuperStructure extends Subsystem {
 
     private boolean continuousShoot = true;
 
-    private boolean requestsCompleted() {
+    public boolean requestsCompleted() {
         return activeRequestsComplete;
     }
 
@@ -246,6 +246,7 @@ public class SuperStructure extends Subsystem {
                 mIndexer.conformToState(Indexer.State.OUTTAKING);
                 mIndexer.setHasPieceRequest(false).act();
                 mIntake.conformToState(Intake.State.OUTTAKING);
+                mShooter.conformToState(Shooter.State.REVERSETRANSFER);
                 break;
             case IDLE:
                 if (stateChanged)
@@ -400,6 +401,8 @@ public class SuperStructure extends Subsystem {
     public void prepareShooterSetpoints(double timestamp) {
         ShootingParameters shootingParameters = getShootingParams(mRobotState.getKalmanPose(timestamp));
         // Logger.recordOutput("Desired Pivot Angle", shootingParameters.compensatedDesiredPivotAngle);
+        Shooter.State state = Shooter.State.SHOOTING;
+        state.output = shootingParameters.compensatedDesiredShooterSpeed;
         mShooter.conformToState(Shooter.State.SHOOTING);
         mPivot.conformToState(shootingParameters.compensatedDesiredPivotAngle - 1);
         mShooter.setSpin(Constants.ShooterConstants.SPIN);
@@ -408,8 +411,10 @@ public class SuperStructure extends Subsystem {
     public void prepareShooterSetpoints(double timestamp, boolean manual) {
         ShootingParameters shootingParameters = getShootingParams(mRobotState.getKalmanPose(timestamp), manual,
                 !inShootZone(timestamp));
+        Shooter.State state = Shooter.State.SHOOTING;
+        state.output = shootingParameters.compensatedDesiredShooterSpeed;
         if (inShootZone(timestamp)) {
-            mShooter.conformToState(Shooter.State.SHOOTING);
+            mShooter.conformToState(state);
             mShooter.setSpin(ShooterConstants.SPIN);
         } else {
             mShooter.setPercent(shootingParameters.compensatedDesiredShooterSpeed);
@@ -610,7 +615,6 @@ public class SuperStructure extends Subsystem {
                     logCurrentRequest("Shoot State"),
                     mShooter.atTargetRequest(),
                     mPivot.atTargetRequest(),
-                    mDrive.isAimedRequest(),
                     mLights.setColorRequest(Color.LOCKED),
                     mIntake.stateRequest(Intake.State.INTAKING),
                     mIndexer.stateRequest(Indexer.State.TRANSFERING),

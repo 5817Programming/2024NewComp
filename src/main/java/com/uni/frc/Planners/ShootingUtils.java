@@ -88,11 +88,13 @@ public class ShootingUtils {
         else{
             compensatedPivotAngle = pivotAngleTreeMap.getInterpolated(new InterpolatingDouble(compensatedDistance)).value+pivotOffset;
             Logger.recordOutput("Desired Pivot Angle", compensatedPivotAngle);
+            Logger.recordOutput("Pivot Offset", pivotOffset);
         }
         double desiredPivotAngle = pivotAngleTreeMap.getInterpolated(new InterpolatingDouble(effectiveDistance)).value;
         double uncompensatedDesiredShooterSpeed = velocityTreeMap.getInterpolated(new InterpolatingDouble(effectiveDistance)).value;
         double compensatedDesiredShooterSpeed = velocityTreeMap.getInterpolated(new InterpolatingDouble(compensatedDistance)).value;
        
+        Logger.recordOutput("compensatedDesiredShooterSpeed", compensatedDesiredShooterSpeed);
         return new ShootingParameters(
             effectiveDistance, 
             compensatedDistance, 

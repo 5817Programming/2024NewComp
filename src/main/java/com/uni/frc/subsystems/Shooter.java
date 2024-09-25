@@ -129,7 +129,7 @@ import com.uni.lib.TalonConfigs;
     return new Request(){
       @Override
       public boolean isFinished() {
-          return Math.abs(shooterMotor1.getVelocity().getValueAsDouble())>(80*mPeriodicIO.driveDemand) ;
+          return Math.abs(shooterMotor1.getVelocity().getValueAsDouble())>(70*mPeriodicIO.driveDemand) ;
       }
     };
    }
