@@ -61,7 +61,7 @@ public class M6 extends AutoBase {
         runAction(new WaitAction(.5));
         runAction(new ParallelAction(List.of(
             new TrajectoryAction(trajectory2),
-            new LambdaAction(() -> s.intakeSta))
+            new LambdaAction(() -> s.intakeState(2))
             )));
         runAction(new WaitAction(1));
         runAction(new LambdaAction(() -> s.shootState(false)));
