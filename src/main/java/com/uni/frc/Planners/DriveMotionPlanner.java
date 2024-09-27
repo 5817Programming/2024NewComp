@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import org.littletonrobotics.junction.Logger;
 
 import com.uni.frc.Constants;
 import com.uni.lib.HeadingController;
@@ -18,7 +17,6 @@ import com.uni.lib.motion.PathPointState;
 import com.uni.lib.motion.TrajectoryIterator;
 import com.uni.lib.swerve.ChassisSpeeds;
 import com.uni.lib.util.ErrorTracker;
-import com.uni.lib.util.PID2d;
 import com.uni.lib.util.Util;
 
 public class DriveMotionPlanner {
@@ -100,7 +98,6 @@ public class DriveMotionPlanner {
 			DriverStation.getAlliance().get() == Alliance.Blue? 3:-3; 
 			// 2.4;/* * Math.ypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond)*/;//0.15;
 		Twist2d pid_error = Pose2d.log(mError);
-		Logger.recordOutput("Error", mError.toWPI());
 		chassisSpeeds.vxMetersPerSecond = (chassisSpeeds.vxMetersPerSecond * 1) - kPathk * pid_error.dx;
 		chassisSpeeds.vyMetersPerSecond = (chassisSpeeds.vyMetersPerSecond * .8) + kPathk * pid_error.dy;
 		// chassisSpeeds.vxMetersPerSecond = (chassisSpeeds.vxMetersPerSecond * 1) ;
@@ -209,8 +206,6 @@ public class DriveMotionPlanner {
 			// Compute error in robot frame
 			mPrevHeadingError = mError.getRotation();
 			mError = current_state.inverse().transformBy(mSetpoint.getPose());
-			Logger.recordOutput("Rotation", current_state.getRotation().getDegrees());
-			Logger.recordOutput("Desired Rotation", mSetpoint.getPose().getRotation().getDegrees());
 			mErrorTracker.addObservation(mError);
 
 
@@ -220,7 +215,6 @@ public class DriveMotionPlanner {
 				System.out.println("Ran");
 				// RobotState.getInstance().setDisplaySetpointPose(Pose2d.fromTranslation(RobotState.getInstance().getFieldToOdom(timestamp)).transformBy(sample_point.state().state().getPose()));
 				mSetpoint = sample_point;
-                Logger.recordOutput("desired path Point", sample_point.getPose().toWPI());
 
 				final double velocity_m = mSetpoint.getVelocity();
 				// Field relative

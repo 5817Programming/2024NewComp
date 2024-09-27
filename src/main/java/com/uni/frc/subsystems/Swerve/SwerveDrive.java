@@ -1,4 +1,5 @@
 // Copyright (c) FIRST and other WPILib contributors.
+
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root dir[]ectory of this project.
 
@@ -474,7 +475,6 @@ boolean mOverrideTrajectory = false;
         resetPose(new Pose2d(new Translation2d(1.9, 4.52), Rotation2d.fromDegrees(0)));
     }
     public boolean isTrajectoryFinished() {
-        Logger.recordOutput("Trajectory Error", mDriveMotionPlanner.getEndPosition().getTranslation().translateBy(poseMeters.getTranslation().inverse()).norm());
          return mDriveMotionPlanner.getEndPosition().getTranslation().translateBy(poseMeters.getTranslation().inverse()).norm() < Units.inchesToMeters(4);
     }
 

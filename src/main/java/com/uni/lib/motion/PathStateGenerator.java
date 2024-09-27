@@ -61,7 +61,6 @@ public class PathStateGenerator{
         .getDegrees();
     double desiredX = desiredState.getTargetHolonomicPose().getTranslation().getX();
     double desiredY = desiredState.getTargetHolonomicPose().getTranslation().getY();
-    Logger.recordOutput("desiredPose", new Pose2d(desiredX, desiredY, Rotation2d.fromDegrees(desiredRotation)).toWPI());
     if (alliance()&& useAllianceColor)
       return new Pose2d(new Translation2d(reflect(desiredX), desiredY), Rotation2d.fromDegrees(desiredRotation));
     else

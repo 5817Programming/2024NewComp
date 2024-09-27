@@ -88,7 +88,7 @@ public class SuperStructure extends Subsystem {
     private boolean pieceAim = true;
     private double pivotOffset = 0;
 
-    private boolean continuousShoot = true;
+    private boolean continuousShoot = false;
 
     public boolean requestsCompleted() {
         return activeRequestsComplete;
@@ -195,8 +195,6 @@ public class SuperStructure extends Subsystem {
     }
 
     public void processState(double timestamp) {
-        Logger.recordOutput("Mode", currentMode);
-        Logger.recordOutput("SuperState", currentState);
         switch (currentState) {
             case SCORE:
                 switch (currentMode) {
@@ -312,7 +310,6 @@ public class SuperStructure extends Subsystem {
     }
 
     public boolean inAmpZone(double timestamp) {
-        Logger.recordOutput("AmpPose", Constants.FieldConstants.getAmpPose().toWPI());
         return mRobotState.getKalmanPose(timestamp).getTranslation()
                 .translateBy(Constants.FieldConstants.getAmpPose().inverse().getTranslation()).norm() < 4;
     }
@@ -400,12 +397,11 @@ public class SuperStructure extends Subsystem {
 
     public void prepareShooterSetpoints(double timestamp) {
         ShootingParameters shootingParameters = getShootingParams(mRobotState.getKalmanPose(timestamp));
-        // Logger.recordOutput("Desired Pivot Angle", shootingParameters.compensatedDesiredPivotAngle);
         Shooter.State state = Shooter.State.SHOOTING;
         state.output = shootingParameters.compensatedDesiredShooterSpeed;
         mShooter.conformToState(Shooter.State.SHOOTING);
         mPivot.conformToState(shootingParameters.compensatedDesiredPivotAngle - 1);
-        mShooter.setSpin(Constants.ShooterConstants.SPIN);
+        mShooter.setSpin(shootingParameters.spin);
     }
 
     public void prepareShooterSetpoints(double timestamp, boolean manual) {
@@ -415,7 +411,7 @@ public class SuperStructure extends Subsystem {
         state.output = shootingParameters.compensatedDesiredShooterSpeed;
         if (inShootZone(timestamp)) {
             mShooter.conformToState(state);
-            mShooter.setSpin(ShooterConstants.SPIN);
+            mShooter.setSpin(shootingParameters.spin);
         } else {
             mShooter.setPercent(shootingParameters.compensatedDesiredShooterSpeed);
             mShooter.setSpin(1);
@@ -423,6 +419,9 @@ public class SuperStructure extends Subsystem {
         mPivot.conformToState(shootingParameters.compensatedDesiredPivotAngle);
         mIndexer.setPiece(false);
     }
+
+
+
 
     public void setContinuousShootState(boolean newContinuousShoot) {
         queue(new Request() {
@@ -432,13 +431,16 @@ public class SuperStructure extends Subsystem {
             }
         });
     }
+    public void setContinuousShoot(boolean continuousShoot) {
+        this.continuousShoot = continuousShoot;
+    }
 
     public void prepareShooterSetpoints() {
         ShootingParameters shootingParameters = getShootingParams(
                 mRobotState.getKalmanPose(Timer.getFPGATimestamp()));
         mPivot.conformToState(shootingParameters.compensatedDesiredPivotAngle);
         mShooter.conformToState(Shooter.State.SHOOTING);
-        mShooter.setSpin(ShooterConstants.SPIN);
+        mShooter.setSpin(shootingParameters.spin);
 
     }
 
@@ -492,7 +494,6 @@ public class SuperStructure extends Subsystem {
         double kShotTime = Constants.ShooterConstants.kShotTime;
 
         Pose2d speakerPose = Constants.getSpeakerPivotPose();
-        Logger.recordOutput("speakerPose", speakerPose.toWPI());
         InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> pivotMap = ShootingUtils
                 .getPivotMap(lob);
         InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> velocityMap = ShootingUtils
@@ -508,6 +509,7 @@ public class SuperStructure extends Subsystem {
                 shotTimeMap,
                 mRobotState.getPredictedVelocity(),
                 manual);// TODO change to measured when it works
+                
         return shootingParameters;
     }
 
@@ -682,7 +684,6 @@ public class SuperStructure extends Subsystem {
 
     public void offsetPivot(double offset) {
         pivotOffset += offset;
-        Logger.recordOutput("Pivot Offset", pivotOffset);
     }
 
     public void waitState(double waitTime, boolean Override) {
@@ -737,6 +738,7 @@ public class SuperStructure extends Subsystem {
 
     @Override
     public void outputTelemetry() {
+        Logger.recordOutput("Pivot Offset", pivotOffset);
         Logger.recordOutput("Countinuous Shoot", continuousShoot);
         Logger.recordOutput("SuperStructure/RequestsCompleted", requestsCompleted());
         Logger.recordOutput("SuperStructure/CurrentRequest", currentRequestLog);

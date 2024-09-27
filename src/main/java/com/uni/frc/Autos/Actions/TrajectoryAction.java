@@ -1,6 +1,9 @@
 package com.uni.frc.Autos.Actions;
 
 
+
+import org.littletonrobotics.junction.Logger;
+
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.uni.frc.subsystems.RobotState;
 import com.uni.frc.subsystems.RobotStateEstimator;
@@ -33,6 +36,7 @@ public class TrajectoryAction implements Action{
 	public void start(){
 		if(mResetGyro){
 			RobotStateEstimator.getInstance().resetOdometry(mTrajectory.getCurrentState().getPose());
+			Logger.recordOutput("TrajectoryAction/ResetOdometry", mTrajectory.getCurrentState().getPose().toWPI());
 		}
 		
 		mDrive.setTrajectory(mTrajectory);

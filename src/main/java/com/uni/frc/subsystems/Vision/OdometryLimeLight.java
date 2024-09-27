@@ -320,7 +320,6 @@ public class OdometryLimeLight extends Subsystem {
       }
       @Override
       public void onLoop(double timestamp) {
-        readInputsAndAddVisionUpdate();
       }
       @Override
       public void onStop(double timestamp) {

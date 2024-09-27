@@ -144,14 +144,11 @@ public final class Discretization {
     //   ϕ = eᴹᵀ = I + MT + 1/2 M²T² + 1/6 M³T³ + …
     //   ϕ = eᴹᵀ = I + MT + 1/2 T²M² + 1/6 T³M³ + …
     //
-    // Taylor series of ϕ expanded for ϕ₁₂:
     //
-    //   ϕ₁₂ = 0 + QT + 1/2 T² (−AQ + QAᵀ) + 1/6 T³ (−A lastTerm + Q Aᵀ²) + …
     //
     // ```
     // lastTerm = Q
     // lastCoeff = T
-    // ATn = Aᵀ
     // ϕ₁₂ = lastTerm lastCoeff = QT
     //
     // for i in range(2, 6):
@@ -171,7 +168,6 @@ public final class Discretization {
     Matrix<States, States> lastTerm = Q.copy();
     double lastCoeff = dtSeconds;
 
-    // Aᵀⁿ
     Matrix<States, States> ATn = contA.transpose();
 
     Matrix<States, States> phi12 = lastTerm.times(lastCoeff);

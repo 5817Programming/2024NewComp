@@ -10,6 +10,7 @@ import com.uni.frc.Autos.Actions.TrajectoryAction;
 import com.uni.frc.Autos.Actions.WaitAction;
 import com.uni.frc.Autos.Actions.WaitForSuperstructureAction;
 import com.uni.frc.subsystems.Pivot;
+import com.uni.frc.subsystems.Shooter;
 import com.uni.frc.subsystems.SuperStructure;
 import com.uni.frc.subsystems.Swerve.SwerveDrive;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -40,11 +41,13 @@ public class M6 extends AutoBase {
     @Override
     public void routine() {
         Pivot.getInstance().conformToState(Pivot.State.MAXUP);
+        Shooter.getInstance().conformToState(Shooter.State.PARTIALRAMP);
         runAction(new WaitAction(1));
         runAction(new LambdaAction(() -> s.shootState(false)));
         runAction(new WaitAction(1));
+        s.setContinuousShoot(true);
         runAction(new ParallelAction(List.of(
-            new TrajectoryAction(trajectory),
+            new TrajectoryAction(trajectory, true),
             new LambdaAction(() -> s.intakeState(2))
             )));
         runAction(new WaitAction(1));

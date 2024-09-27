@@ -64,6 +64,7 @@ public class RobotState {
 
 
     public synchronized void reset(double start_time, Pose2d initialPose) {
+        resetKalmanFilters(start_time);
         poseFromOdom = new InterpolatingTreeMap<>(kObservationBufferSize);
         poseFromOdom.put(new InterpolatingDouble(start_time), initialPose);
         visionPoseComponent = new InterpolatingTreeMap<>(kObservationBufferSize);
@@ -82,9 +83,7 @@ public class RobotState {
     }
 
     public synchronized void resetKalmanFilters(double timestamp) {
-        visionPoseComponent = new InterpolatingTreeMap<>(kObservationBufferSize);
-        visionPoseComponent.put(new InterpolatingDouble(timestamp), getInitialPose().getTranslation());
-        mKalmanFilter =
+       mKalmanFilter =
         new UnscentedKalmanFilter<>(
             Nat.N2(),
             Nat.N2(),
@@ -174,7 +173,6 @@ public class RobotState {
             }
 
                 var visionOdomError = visionFieldToVehicle.getTranslation().translateBy(odomToVehicle.getTranslation().inverse());
-                // Logger.recordOutput("visionOdomError", visionOdomError.toWPI());
                 mDisplayVisionPose = visionFieldToVehicle;
                 try {
                     mKalmanFilter.correct(VecBuilder.fill(0.0, 0.0), VecBuilder.fill(visionOdomError.getTranslation().x(), visionOdomError.getTranslation().y()));

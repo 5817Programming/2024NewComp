@@ -7,6 +7,7 @@ package com.uni.frc.Planners;
 import org.littletonrobotics.junction.Logger;
 
 import com.uni.frc.Constants;
+import com.uni.frc.Constants.ShooterConstants;
 import com.uni.frc.subsystems.RobotState;
 import com.uni.lib.geometry.Pose2d;
 import com.uni.lib.geometry.Translation2d;
@@ -28,6 +29,7 @@ public class ShootingUtils {
     public static class ShootingParameters{
         public double effectiveDistance;
         public double compensatedDistance;
+        public double spin;
 
         public double uncompensatedDesiredPivotAngle;
         public double compensatedDesiredPivotAngle;
@@ -44,9 +46,11 @@ public class ShootingUtils {
            double uncompensatedDesiredPivotAngle,
 
            double compensatedDesiredShooterSpeed,
-           double uncompensatedDesiredShooterSpeed
+           double uncompensatedDesiredShooterSpeed,
+           double spin
 
         ){
+         this.spin = spin;
          this.effectiveDistance = effectiveDistance;
          this.compensatedDistance = compensatedDistance;
          this.compensatedDesiredPivotAngle = compensatedDesiredPivotAngle;
@@ -75,11 +79,7 @@ public class ShootingUtils {
         Pose2d poseAtTimeFrame = RobotState.getInstance().getPredictedPose(lookahead_time*1.3);
         Translation2d futureOdomToTargetPoint = poseAtTimeFrame.getTranslation().translateBy(targetPose.getTranslation().inverse());
 
-        Logger.recordOutput("speakerpose", poseAtTimeFrame.toWPI());
-        Logger.recordOutput("Time", lookahead_time);
-
         double compensatedDistance = futureOdomToTargetPoint.norm();
-        Logger.recordOutput("Compensated Distance", compensatedDistance);
 
         
         double compensatedPivotAngle;
@@ -87,21 +87,24 @@ public class ShootingUtils {
             compensatedPivotAngle = 55;
         else{
             compensatedPivotAngle = pivotAngleTreeMap.getInterpolated(new InterpolatingDouble(compensatedDistance)).value+pivotOffset;
-            Logger.recordOutput("Desired Pivot Angle", compensatedPivotAngle);
-            Logger.recordOutput("Pivot Offset", pivotOffset);
-        }
+            compensatedPivotAngle = compensatedPivotAngle*1.15;
+       }
+       Logger.recordOutput("compensatedDistance", compensatedDistance);
         double desiredPivotAngle = pivotAngleTreeMap.getInterpolated(new InterpolatingDouble(effectiveDistance)).value;
         double uncompensatedDesiredShooterSpeed = velocityTreeMap.getInterpolated(new InterpolatingDouble(effectiveDistance)).value;
         double compensatedDesiredShooterSpeed = velocityTreeMap.getInterpolated(new InterpolatingDouble(compensatedDistance)).value;
-       
-        Logger.recordOutput("compensatedDesiredShooterSpeed", compensatedDesiredShooterSpeed);
+        double compensatedSpin = ShooterConstants.SPIN_TREE_MAP.getInterpolated(new InterpolatingDouble(compensatedDistance)).value;
+        if(compensatedPivotAngle>30*1.45){
+            compensatedPivotAngle = 30*1.45;
+        }
         return new ShootingParameters(
             effectiveDistance, 
             compensatedDistance, 
             compensatedPivotAngle,
             desiredPivotAngle,
             compensatedDesiredShooterSpeed, 
-            uncompensatedDesiredShooterSpeed
+            uncompensatedDesiredShooterSpeed,
+            compensatedSpin
 
             );
     }

@@ -61,7 +61,6 @@ public class Robot extends LoggedRobot {
     public void robotInit() {
       autos.put("Middle 6", new M6());
   
-  
       // autos.put("1", new Shoot());
   
       DriverStation.startDataLog(DataLogManager.getLog());
@@ -100,16 +99,18 @@ public class Robot extends LoggedRobot {
   
     @Override
     public void robotPeriodic() {
+      auto = autoChooser.get();
+      
       mEnabledLooper.outputToSmartDashboard();
           mSubsystemManager.outputLoopTimes();
-      Logger.recordOutput("timestamp", Timer.getFPGATimestamp());
+      SubsystemManager.getInstance().outputTelemetry();
+      OdometryLimeLight.getInstance().readInputsAndAddVisionUpdate();
     }
   
   
   
     @Override
     public void autonomousInit() {
-      auto = autoChooser.get();
       swerve = SwerveDrive.getInstance();
       swerve.resetGryo(OdometryLimeLight.getInstance().getMovingAverageHeading());
       swerve.zeroModules();
@@ -129,9 +130,9 @@ public class Robot extends LoggedRobot {
     public void teleopInit() {
       mEnabledLooper.start();
       swerve = SwerveDrive.getInstance();
+      RobotStateEstimator.getInstance().resetOdometry(new Pose2d(15.18,5.48,Rotation2d.kIdentity));
       // swerve.fieldzeroSwerve();
       swerve.zeroModules();
-      RobotStateEstimator.getInstance().resetOdometry(new Pose2d(15.18,5.48,Rotation2d.kIdentity));
   
     }
   
@@ -157,7 +158,6 @@ public class Robot extends LoggedRobot {
     @Override
     public void disabledPeriodic() {
       RobotState.getInstance().outputTelemetry();
-      OdometryLimeLight.getInstance().readInputsAndAddVisionUpdate();
     }
   
     /** This function is called once when test mode is enabled. */
