@@ -21,8 +21,6 @@ import com.uni.frc.loops.Loop;
 import com.uni.frc.subsystems.RobotState;
 import com.uni.frc.subsystems.Subsystem;
 import com.uni.frc.subsystems.Requests.Request;
-import com.uni.frc.subsystems.Swerve.SwerveDrive;
-import com.uni.frc.subsystems.gyros.Gyro;
 import com.uni.frc.subsystems.gyros.Pigeon;
 import com.uni.lib.Vision.LimelightHelpers;
 import com.uni.lib.Vision.TargetInfo;
@@ -30,10 +28,12 @@ import com.uni.lib.Vision.UndistortMap;
 import com.uni.lib.geometry.Pose2d;
 import com.uni.lib.geometry.Rotation2d;
 import com.uni.lib.geometry.Translation2d;
+import com.uni.lib.util.MovingAverage;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 
 import static org.opencv.core.CvType.CV_64FC1;
@@ -50,7 +50,7 @@ public class OdometryLimeLight extends Subsystem {
   private Mat mDistortionCoeffients = new Mat(1, 5, CV_64FC1);
 
   private boolean mOutputsHaveChanged = true;
-
+  private MovingAverage movingAverage = new MovingAverage(100);
   private static HashMap<Integer, AprilTag> mTagMap = FieldLayout.Red.kAprilTagMap;
 
   public static OdometryLimeLight getInstance() {
@@ -97,7 +97,7 @@ public class OdometryLimeLight extends Subsystem {
     }
   }
 
-  private void readInputsAndAddVisionUpdate() {
+  public void readInputsAndAddVisionUpdate() {
     final double timestamp = Timer.getFPGATimestamp();
     mPeriodicIO.imageCaptureLatency = table.getEntry("cl").getDouble(Constants.VisionConstants.IMAGE_CAPTURE_LATENCY);
     mPeriodicIO.latency = table.getEntry("tl").getDouble(0) / 1000.0 + mPeriodicIO.imageCaptureLatency / 1000.0;
@@ -110,12 +110,12 @@ public class OdometryLimeLight extends Subsystem {
     mPeriodicIO.ta = table.getEntry("ta").getDouble(0);
     LimelightHelpers.SetRobotOrientation("limelight-up", 180-Pigeon.getInstance().getAngle(), 0, 0, 0, 0, 0);
     Pose2d mt2 = new Pose2d(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-up").pose);
-    
+    Pose2d mt = new Pose2d(LimelightHelpers.getBotPose2d_wpiBlue("limelight-up"));
+    movingAverage.addNumber(mt.getRotation().flip().getDegrees());
 
     int tagId = mPeriodicIO.tagId;
-
     if (mPeriodicIO.seesTarget) {
-      if (mt2 != Pose2d.identity()) {
+      if (mt2 != Pose2d.identity() && mPeriodicIO.useVision) {
         mPeriodicIO.visionUpdate = Optional 
             .of(new VisionUpdate(timestamp - mPeriodicIO.latency, mt2));
         RobotState.getInstance().addVisionUpdate(
@@ -128,6 +128,21 @@ public class OdometryLimeLight extends Subsystem {
       mPeriodicIO.visionUpdate = Optional.empty();
     }
   }
+  public void setVision(boolean useVision){
+    if(useVision != mPeriodicIO.useVision){
+      mPeriodicIO.useVision = useVision;
+    }
+  }
+
+  public double getMovingAverageHeading(){
+    return movingAverage.getAverage();
+  }
+
+  public void resetMovingAverageHeading(){
+    movingAverage = new MovingAverage(100);
+  }
+
+
 
   public Optional<VisionUpdate> getLatestVisionUpdate() {
     return mPeriodicIO.visionUpdate;
@@ -289,6 +304,7 @@ public class OdometryLimeLight extends Subsystem {
     public double ta = 0;
     public double tx = 0;
     public double ty = 0;
+    public boolean useVision = true;
   }
 
   @Override
@@ -304,7 +320,6 @@ public class OdometryLimeLight extends Subsystem {
       }
       @Override
       public void onLoop(double timestamp) {
-        readInputsAndAddVisionUpdate();
       }
       @Override
       public void onStop(double timestamp) {

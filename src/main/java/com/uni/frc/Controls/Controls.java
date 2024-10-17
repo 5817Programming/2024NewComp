@@ -62,7 +62,7 @@ public class Controls {
             amp = false;
 
         if (Driver.StartButton.isPressed())
-            swerve.fieldzeroSwerve();
+            swerve.fieldZeroSwerve();
 
         if(Driver.AButton.isActive()||CoDriver.AButton.isActive())
             Climb.getInstance().conformToState(Climb.State.UP);

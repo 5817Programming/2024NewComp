@@ -93,6 +93,23 @@ public class SwerveKinematics {
         return driveVectors;
         
     }
+    public List<Translation2d> updateDriveVectorsVelocity(Translation2d translationVector, double rotationalMagnitude, Pose2d robotPosition, boolean robotCentric) {
+        List<Translation2d> driveVectors = new ArrayList<>(m_numModules);
+        if(!robotCentric)
+            translationVector = translationVector.rotateBy(robotPosition.getRotation().inverse()); //Rotates by the translation vector by inverse rotation of the robot 
+        for(int i = 0; i < m_numModules; i++) {
+            driveVectors.add(translationVector.translateBy(moduleRotationVectors.get(i).scale(rotationalMagnitude))); //Rotates the translation vector of each of the modules, by the rotation value
+        }
+
+    //     double maxMagnitude = Constants.SwerveMaxspeedMPS;
+    //    for (int i =0; i< m_numModules; i++) {
+    //         Translation2d driveVector = driveVectors.get(i);
+    //         driveVectors.set(i, driveVector.scale(1.0/maxMagnitude));
+    //     }
+        return driveVectors;
+        
+    }
+
 
     public static void desaturateWheelSpeeds(
 			SwerveModuleState[] moduleStates, double attainableMaxSpeedMetersPerSecond) {
@@ -145,7 +162,7 @@ public class SwerveKinematics {
                 chassisSpeedsVector.get(2, 0));
     }
     	@SuppressWarnings("PMD.MethodReturnsInternalArray")
-	public SwerveModuleState[] toModuleStates(ChassisSpeeds chassisSpeeds, Translation2d centerOfRotationMeters) {
+	public SwerveModuleState[] toModuleStates(ChassisSpeeds chassisSpeeds, Translation2d centerOfRotationMeters, Rotation2d robotHeading) {
 		if (chassisSpeeds.vxMetersPerSecond == 0.0
 				&& chassisSpeeds.vyMetersPerSecond == 0.0
 				&& chassisSpeeds.omegaRadiansPerSecond == 0.0) {
@@ -183,7 +200,7 @@ public class SwerveKinematics {
 			double speed = Math.hypot(x, y);
 			Rotation2d angle = new Rotation2d(x, y, true);
 
-			mModuleStates[i] = new SwerveModuleState(speed, angle);
+			mModuleStates[i] = new SwerveModuleState(speed, angle.rotateBy(robotHeading.inverse()));
 		}
 
 		return mModuleStates;
@@ -196,7 +213,7 @@ public class SwerveKinematics {
 	 * @param chassisSpeeds The desired chassis speed.
 	 * @return An array containing the module states.
 	 */
-	public SwerveModuleState[] toModuleStates(ChassisSpeeds chassisSpeeds) {
-		return toModuleStates(chassisSpeeds, new Translation2d());
+	public SwerveModuleState[] toModuleStates(ChassisSpeeds chassisSpeeds, Rotation2d robotHeading) {
+		return toModuleStates(chassisSpeeds, new Translation2d(), robotHeading);
 	}
 }

@@ -2,7 +2,6 @@ package com.uni.frc.Planners;
 
 import java.util.OptionalDouble;
 
-import org.littletonrobotics.junction.Logger;
 
 import com.uni.frc.Constants;
 import com.uni.frc.subsystems.Music;
@@ -77,9 +76,7 @@ public class AutoAlignMotionPlanner {
 
         Translation2d output = new Translation2d(xOutput,yOutput).rotateBy(currentHeading);
         ChassisSpeeds setPoint;
-                Logger.recordOutput("auto align outputs", output.toWPI());
         Pose2d distance = currentOdomToVehicle.transformBy(odomToTargetPoint.inverse());
-        Logger.recordOutput("distance to setpoint", distance.toWPI());
         boolean yOutputWithinDeadband = Math.abs(output.y()) < .3;
         boolean xOutputWithinDeadband = Math.abs(output.x()) < .2;
         

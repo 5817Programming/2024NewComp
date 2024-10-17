@@ -165,8 +165,7 @@ import com.uni.frc.Constants.ElevatorConstants;
 
     @Override
     public void outputTelemetry() {
-      Logger.recordOutput("climber encoder 1", mPeriodicIO.rotationDemand);
-      Logger.recordOutput("climber encoder 2", elevatorMotor2.getPosition().getValueAsDouble());
+      Logger.recordOutput("Climber/Position", mPeriodicIO.rotationDemand);
       
 
     }

@@ -1,5 +1,6 @@
 package com.uni.frc.subsystems;
 
+import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -18,7 +19,7 @@ import com.uni.lib.LoggedTunableNumber;
 import com.uni.lib.TalonConfigs;
 
 public class Pivot extends Subsystem {
-  private PeriodicIO mPeriodicIO = new PeriodicIO();
+  private PeriodicIOAutoLogged mPeriodicIO = new PeriodicIOAutoLogged();
   private TalonFX pivotMotor1 = new TalonFX(Ports.Pivot1, "Minivore");
   private TalonFX pivotMotor2 = new TalonFX(Ports.Pivot2, "Minivore");
 
@@ -207,9 +208,9 @@ public class Pivot extends Subsystem {
 
   @Override
   public void outputTelemetry() {
-    Logger.recordOutput("Pivot Position", pivotMotor1.getPosition().getValue() * 360);
-    Logger.recordOutput("Pivot Absolute Position", encoder.getAbsolutePosition().getValue());
-    Logger.recordOutput("pivot demand", mPeriodicIO.rotationDemand);
+    Logger.recordOutput("Pivot/Position", pivotMotor1.getPosition().getValue() * 360);
+    Logger.recordOutput("Pivot/Absolute Position", encoder.getAbsolutePosition().getValue());
+    Logger.recordOutput("Pivot/Demand", mPeriodicIO.rotationDemand);
 
   }
 
@@ -217,7 +218,7 @@ public class Pivot extends Subsystem {
   public void stop() {
     setpivotPercentRequest(0);
   }
-
+  @AutoLog
   public static class PeriodicIO {
     ControlMode rotationControlMode = ControlMode.MotionMagic;
     double rotationPosition = 0;

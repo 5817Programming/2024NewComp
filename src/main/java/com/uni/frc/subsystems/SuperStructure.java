@@ -39,9 +39,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public class SuperStructure extends Subsystem {
     protected Intake mIntake;
     protected OdometryLimeLight vision;
-    protected DriveMotionPlanner mDriveMotionPlanner;
     protected Logger logger;
-    protected DriveMotionPlanner dMotionPlanner;
     protected RobotState mRobotState;
     protected Indexer mIndexer;
     protected Pivot mPivot;
@@ -56,7 +54,6 @@ public class SuperStructure extends Subsystem {
     public SuperStructure() {
         mPathStateGenerator = PathStateGenerator.getInstance();
         vision = OdometryLimeLight.getInstance();
-        mDriveMotionPlanner = DriveMotionPlanner.getInstance();
         mArm = Arm.getInstance();
         mRobotState = RobotState.getInstance();
         mIntake = Intake.getInstance();
@@ -91,9 +88,9 @@ public class SuperStructure extends Subsystem {
     private boolean pieceAim = true;
     private double pivotOffset = 0;
 
-    private boolean continuousShoot = true;
+    private boolean continuousShoot = false;
 
-    private boolean requestsCompleted() {
+    public boolean requestsCompleted() {
         return activeRequestsComplete;
     }
 
@@ -198,8 +195,6 @@ public class SuperStructure extends Subsystem {
     }
 
     public void processState(double timestamp) {
-        Logger.recordOutput("Mode", currentMode);
-        Logger.recordOutput("SuperState", currentState);
         switch (currentState) {
             case SCORE:
                 switch (currentMode) {
@@ -249,6 +244,7 @@ public class SuperStructure extends Subsystem {
                 mIndexer.conformToState(Indexer.State.OUTTAKING);
                 mIndexer.setHasPieceRequest(false).act();
                 mIntake.conformToState(Intake.State.OUTTAKING);
+                mShooter.conformToState(Shooter.State.REVERSETRANSFER);
                 break;
             case IDLE:
                 if (stateChanged)
@@ -294,8 +290,11 @@ public class SuperStructure extends Subsystem {
                 mArm.stop();
                 break;
             case AUTO:
-                if (continuousShoot)
-                    prepareShooterSetpoints(timestamp);
+                if (continuousShoot){
+                   prepareShooterSetpoints(timestamp);
+                    stateChanged = false;
+                }
+
                 break;
 
         }
@@ -311,7 +310,6 @@ public class SuperStructure extends Subsystem {
     }
 
     public boolean inAmpZone(double timestamp) {
-        Logger.recordOutput("AmpPose", Constants.FieldConstants.getAmpPose().toWPI());
         return mRobotState.getKalmanPose(timestamp).getTranslation()
                 .translateBy(Constants.FieldConstants.getAmpPose().inverse().getTranslation()).norm() < 4;
     }
@@ -399,18 +397,21 @@ public class SuperStructure extends Subsystem {
 
     public void prepareShooterSetpoints(double timestamp) {
         ShootingParameters shootingParameters = getShootingParams(mRobotState.getKalmanPose(timestamp));
-        Logger.recordOutput("Desired Pivot Angle", shootingParameters.compensatedDesiredPivotAngle);
+        Shooter.State state = Shooter.State.SHOOTING;
+        state.output = shootingParameters.compensatedDesiredShooterSpeed;
         mShooter.conformToState(Shooter.State.SHOOTING);
         mPivot.conformToState(shootingParameters.compensatedDesiredPivotAngle - 1);
-        mShooter.setSpin(Constants.ShooterConstants.SPIN);
+        mShooter.setSpin(shootingParameters.spin);
     }
 
     public void prepareShooterSetpoints(double timestamp, boolean manual) {
         ShootingParameters shootingParameters = getShootingParams(mRobotState.getKalmanPose(timestamp), manual,
                 !inShootZone(timestamp));
+        Shooter.State state = Shooter.State.SHOOTING;
+        state.output = shootingParameters.compensatedDesiredShooterSpeed;
         if (inShootZone(timestamp)) {
-            mShooter.conformToState(Shooter.State.SHOOTING);
-            mShooter.setSpin(ShooterConstants.SPIN);
+            mShooter.conformToState(state);
+            mShooter.setSpin(shootingParameters.spin);
         } else {
             mShooter.setPercent(shootingParameters.compensatedDesiredShooterSpeed);
             mShooter.setSpin(1);
@@ -418,6 +419,9 @@ public class SuperStructure extends Subsystem {
         mPivot.conformToState(shootingParameters.compensatedDesiredPivotAngle);
         mIndexer.setPiece(false);
     }
+
+
+
 
     public void setContinuousShootState(boolean newContinuousShoot) {
         queue(new Request() {
@@ -427,13 +431,16 @@ public class SuperStructure extends Subsystem {
             }
         });
     }
+    public void setContinuousShoot(boolean continuousShoot) {
+        this.continuousShoot = continuousShoot;
+    }
 
     public void prepareShooterSetpoints() {
         ShootingParameters shootingParameters = getShootingParams(
                 mRobotState.getKalmanPose(Timer.getFPGATimestamp()));
         mPivot.conformToState(shootingParameters.compensatedDesiredPivotAngle);
         mShooter.conformToState(Shooter.State.SHOOTING);
-        mShooter.setSpin(ShooterConstants.SPIN);
+        mShooter.setSpin(shootingParameters.spin);
 
     }
 
@@ -487,7 +494,6 @@ public class SuperStructure extends Subsystem {
         double kShotTime = Constants.ShooterConstants.kShotTime;
 
         Pose2d speakerPose = Constants.getSpeakerPivotPose();
-        Logger.recordOutput("speakerPose", speakerPose.toWPI());
         InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> pivotMap = ShootingUtils
                 .getPivotMap(lob);
         InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> velocityMap = ShootingUtils
@@ -503,6 +509,7 @@ public class SuperStructure extends Subsystem {
                 shotTimeMap,
                 mRobotState.getPredictedVelocity(),
                 manual);// TODO change to measured when it works
+                
         return shootingParameters;
     }
 
@@ -536,30 +543,6 @@ public class SuperStructure extends Subsystem {
         queue(mPivot.stateRequest(position));
     }
 
-    public void trajectoryState(PathPlannerTrajectory trajectory, double initRotation) {
-        RequestList request = new RequestList(Arrays.asList(
-                logCurrentRequest("trajectory")), true);
-        RequestList queue = new RequestList(Arrays.asList(
-                mDriveMotionPlanner.setTrajectoryRequest(trajectory, initRotation, true),
-                mDrive.setStateRequest(SwerveDrive.State.TRAJECTORY),
-                mDriveMotionPlanner.startPathRequest(true)), false);
-        queue(request);
-        queue(queue);
-    }
-
-    public void onTheFlyTrajectoryState(Pose2d endPose, double timestamp) {
-        RequestList request = new RequestList(Arrays.asList(
-                logCurrentRequest("OnTheFly"),
-                mDriveMotionPlanner.generatePathRequest(
-                        mRobotState.getKalmanPose(timestamp),
-                        endPose,
-                        ChassisSpeeds.fromTwist2d(mRobotState.getPredictedVelocity(), mDrive.getRobotHeading()),
-                        false),
-                mDrive.setStateRequest(SwerveDrive.State.TRAJECTORY),
-                mDriveMotionPlanner.startPathRequest(false)), false);
-
-        request(request);
-    }
 
     public void intakeState() {
         RequestList request = new RequestList(Arrays.asList(
@@ -580,12 +563,11 @@ public class SuperStructure extends Subsystem {
     public void intakeState(double timeout) {
         RequestList request = new RequestList(Arrays.asList(
                 logCurrentRequest("Intaking"),
-                mDrive.setModeRequest(TrajectoryMode.TRACKING),
+                mIndexer.setHasPieceRequest(false),
                 mLights.setColorRequest(Color.INTAKING),
                 mIntake.stateRequest(Intake.State.INTAKING),
                 mIndexer.stateRequest(Indexer.State.RECIEVING),
                 mIndexer.hasPieceRequest(timeout),
-                mDrive.setModeRequest(TrajectoryMode.FOLLOWING),
                 mLights.setColorRequest(Color.INTAKED),
                 mIndexer.stateRequest(Indexer.State.OFF),
                 mIntake.stateRequest(Intake.State.OFF),
@@ -615,31 +597,8 @@ public class SuperStructure extends Subsystem {
         queue(mShooter.setPercentRequest(percent));
     }
 
-    public void waitForEventState(double timestamp) {
-        queue(mDriveMotionPlanner.waitForTrajectoryRequest(timestamp));
-    }
-
     public void setManual(boolean Override) {
         manual = Override;
-    }
-
-    public void waitForPositionState(Translation2d other) {
-        queue(
-                new Request() {
-                    @Override
-                    public boolean isFinished() {
-                        Logger.recordOutput("event", Pose2d.fromTranslation(other.reflect()).toWPI());
-                        double timeStamp = Timer.getFPGATimestamp();
-                        if (DriverStation.getAlliance().get().equals(Alliance.Blue))
-                            return other.translateBy(
-                                    mRobotState.getKalmanPose(timeStamp).getTranslation().inverse())
-                                    .norm() < 0.7;
-                        return other.reflect().translateBy(
-                                mRobotState.getKalmanPose(timeStamp).getTranslation().inverse())
-                                .norm() < 0.7;
-
-                    }
-                });
     }
 
     public void printState(String string) {
@@ -652,11 +611,12 @@ public class SuperStructure extends Subsystem {
     }
 
     public void shootState(boolean Override) {
+
         if (Override) {
             RequestList queue = new RequestList(Arrays.asList(
+                    logCurrentRequest("Shoot State"),
                     mShooter.atTargetRequest(),
                     mPivot.atTargetRequest(),
-                    mDrive.isAimedRequest(),
                     mLights.setColorRequest(Color.LOCKED),
                     mIntake.stateRequest(Intake.State.INTAKING),
                     mIndexer.stateRequest(Indexer.State.TRANSFERING),
@@ -667,6 +627,7 @@ public class SuperStructure extends Subsystem {
             request(queue);
         } else {
             RequestList queue = new RequestList(Arrays.asList(
+                    logCurrentRequest("Shoot State"),
                     mLights.setColorRequest(Color.AIMING),
                     // mPivot.atTargetRequest(),
                     mLights.setColorRequest(Color.SHOOTING),
@@ -723,7 +684,6 @@ public class SuperStructure extends Subsystem {
 
     public void offsetPivot(double offset) {
         pivotOffset += offset;
-        Logger.recordOutput("Pivot Offset", pivotOffset);
     }
 
     public void waitState(double waitTime, boolean Override) {
@@ -778,9 +738,10 @@ public class SuperStructure extends Subsystem {
 
     @Override
     public void outputTelemetry() {
+        Logger.recordOutput("Pivot Offset", pivotOffset);
         Logger.recordOutput("Countinuous Shoot", continuousShoot);
-        Logger.recordOutput("RequestsCompleted", requestsCompleted());
-        Logger.recordOutput("CurrentRequest", currentRequestLog);
+        Logger.recordOutput("SuperStructure/RequestsCompleted", requestsCompleted());
+        Logger.recordOutput("SuperStructure/CurrentRequest", currentRequestLog);
     }
 
     @Override

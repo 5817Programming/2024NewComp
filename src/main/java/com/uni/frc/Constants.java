@@ -79,14 +79,15 @@ public class Constants {
             -mRobotBaseLength / 2);
     public static final Translation2d mRearRightPosition = new Translation2d(-mRobotBaseWidth / 2,
             mRobotBaseLength / 2);
+    public static final Translation2d[] mModulePositions = {
+		
+			new Translation2d(-mRobotBaseLength / 2.0, mRobotBaseWidth / 2.0),
+            new Translation2d(-mRobotBaseLength / 2.0, -mRobotBaseWidth / 2.0),
+			new Translation2d(mRobotBaseLength / 2.0, -mRobotBaseWidth / 2.0),
+			new Translation2d(mRobotBaseLength / 2.0, mRobotBaseWidth / 2.0),
+	};
 
-    public static final Translation2d[] mModulePositions = new Translation2d[] {
-        mFrontRightPosition,
-        mFrontLeftPosition,
-        mRearLeftPosition,
-        mRearRightPosition
-    };
- 
+
     public static final List<Translation2d> kModulePositions = Arrays.asList(kFrontRightPosition, kFrontLeftPosition,
             kRearLeftPosition, kRearRightPosition);
 
@@ -107,7 +108,7 @@ public class Constants {
     public static final double driveKA = (0.27 / 12);
 
     public static final double kSwerveMaxspeedMPS = 10;
-    public static final double SwerveMaxspeedMPS = 120;
+    public static final double SwerveMaxspeedMPS = 4;
     public static final double kSwerveDriveMaxSpeed = 22000.0; // The theoretical max speed(For the Falcon 500s)
     public static final double kSwerveRotation10VoltMaxSpeed = 1350.0;
 
@@ -118,7 +119,7 @@ public class Constants {
     public static final double kSwerveWheelReduction = Options.driveRatio; // The Wheel to Motor Ratio(i.e, amount the
                                                                            // drive motor rotates, for every one
                                                                            // rotation for the wheel)
-    public static final double kSwerveRotationEncoderResolution = 2048.0;
+    public static final double derResolution = 2048.0;
     public static final double kSwerveDriveEncoderResolution = 2048.0;
 
     public static final double kSwerveWheelDiameter = 4; // inches
@@ -151,7 +152,9 @@ public class Constants {
 
     public static final boolean tuningMode = true;
 
-    public static final boolean disableExtraTelemetry = true;
+    public static final boolean disableExtraTelemetry = false;
+
+public static final double kLooperDt = 0.02;
 
     public static final class ShooterConstants {
         public static final double HANDOFF = 0;
@@ -163,7 +166,6 @@ public class Constants {
         public static final double kShotTime = 1.2;
         public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> SHOT_TRAVEL_TIME_TREE_MAP = new InterpolatingTreeMap<>();
         public static final double kDeadband = 0;
-        public static final double SPIN = 0.5;
         public static final double kShooterHeight = .14 ;
         public static final double kEncoderDistance = 0.113;
         static {
@@ -172,9 +174,15 @@ public class Constants {
         }
         public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> SPEAKER_VELOCITY_TREE_MAP = new InterpolatingTreeMap<>();
         static {
-            SPEAKER_VELOCITY_TREE_MAP.put(new InterpolatingDouble(1.0), new InterpolatingDouble(1.0));
-            SPEAKER_VELOCITY_TREE_MAP.put(new InterpolatingDouble(6.0), new InterpolatingDouble(1.0));
+            SPEAKER_VELOCITY_TREE_MAP.put(new InterpolatingDouble(1.0), new InterpolatingDouble(.4));
+            SPEAKER_VELOCITY_TREE_MAP.put(new InterpolatingDouble(3.0), new InterpolatingDouble(1.0));
         }
+        public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> SPIN_TREE_MAP = new InterpolatingTreeMap<>();
+        static{
+            SPIN_TREE_MAP.put(new InterpolatingDouble(1.0), new InterpolatingDouble(1.0));
+            SPIN_TREE_MAP.put(new InterpolatingDouble(3.0), new InterpolatingDouble(.5));
+        }
+        
         public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> LOB_VELOCITY_TREE_MAP = new InterpolatingTreeMap<>();
         static {
             LOB_VELOCITY_TREE_MAP.put(new InterpolatingDouble(8.25), new InterpolatingDouble(0.6));
@@ -216,28 +224,22 @@ public class Constants {
 
     public static final class PivotConstants {
         public static final double SPEAKER = 0;
-        public static final double AMP = 25;
+        public static final double AMP = 12.5;
         public static final double TRAP = 0;
         public static final double TRANSFER = 0;
         public static final double SHOOTING = 0;
-        public static final double MAX_UP = 55;
+        public static final double MAX_UP = 30*1.45;
         public static final double MAX_DOWN = 0;
         public static final double INTAKING = 10;
 
         public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> SpeakerAngleMap = new InterpolatingTreeMap<>();
-        static {
-            SpeakerAngleMap.put(new InterpolatingDouble(1.36), new InterpolatingDouble(23.5));//
-            SpeakerAngleMap.put(new InterpolatingDouble(1.77), new InterpolatingDouble(18.5));//
-            SpeakerAngleMap.put(new InterpolatingDouble(2.31), new InterpolatingDouble(11.5));//
-            SpeakerAngleMap.put(new InterpolatingDouble(2.57), new InterpolatingDouble(10.5));//
-            SpeakerAngleMap.put(new InterpolatingDouble(3.17), new InterpolatingDouble(6.0));//
-            SpeakerAngleMap.put(new InterpolatingDouble(3.46), new InterpolatingDouble(4.5));//
-            SpeakerAngleMap.put(new InterpolatingDouble(3.75), new InterpolatingDouble(4.0));//
-            SpeakerAngleMap.put(new InterpolatingDouble(4.0), new InterpolatingDouble(3.0));//
-            SpeakerAngleMap.put(new InterpolatingDouble(4.3), new InterpolatingDouble(2.0));//
-            SpeakerAngleMap.put(new InterpolatingDouble(4.79), new InterpolatingDouble(1.0));//
-            SpeakerAngleMap.put(new InterpolatingDouble(5.25), new InterpolatingDouble(.5));//
-           SpeakerAngleMap.put(new InterpolatingDouble(6.16), new InterpolatingDouble(0.0));//
+        static{
+            SpeakerAngleMap.put(new InterpolatingDouble(1.1), new InterpolatingDouble(43.375));
+            SpeakerAngleMap.put(new InterpolatingDouble(2.11), new InterpolatingDouble(26.0));
+            SpeakerAngleMap.put(new InterpolatingDouble(2.9), new InterpolatingDouble(17.1));
+            SpeakerAngleMap.put(new InterpolatingDouble(3.63), new InterpolatingDouble(10.563));
+            SpeakerAngleMap.put(new InterpolatingDouble(4.3), new InterpolatingDouble(6.5625));
+            SpeakerAngleMap.put(new InterpolatingDouble(5.0), new InterpolatingDouble(2.51875));
 
        }
         public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> LobAngleMap = new InterpolatingTreeMap<>();
@@ -291,9 +293,9 @@ public class Constants {
     }
     
 public static final class FieldConstants {
-
+    public static double kFieldLength = Units.inchesToMeters(651.223);
     public final static double kSpeakerHeight = 2.07;
-    
+
          public static double[] reflect(double xs[]) {
             for(int i =0; i<xs.length; i++){
                 xs[i] =16.5-xs[i];

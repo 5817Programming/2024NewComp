@@ -17,7 +17,7 @@ import com.uni.lib.TalonConfigs;
    private TalonFX shooterMotor2 = new TalonFX(Ports.shooter2, "Minivore");
    public State currentState = State.IDLE;
    private TalonFXConfiguration shooterConfig = new TalonFXConfiguration();
-   private double spinMultiplier = ShooterConstants.SPIN;
+   private double spinMultiplier = 1;
    public static Shooter instance = null;
 
    public static Shooter getInstance() {
@@ -37,7 +37,7 @@ import com.uni.lib.TalonConfigs;
     TRANSFER(0.3),
     REVERSETRANSFER(-.5),
     AMP(.5),
-    IDLE(0);
+    IDLE(.1);
 
     double output = 0;
     State(double output){
@@ -129,7 +129,7 @@ import com.uni.lib.TalonConfigs;
     return new Request(){
       @Override
       public boolean isFinished() {
-          return Math.abs(shooterMotor1.getVelocity().getValueAsDouble())>(80*mPeriodicIO.driveDemand) ;
+          return Math.abs(shooterMotor1.getVelocity().getValueAsDouble())>(70*mPeriodicIO.driveDemand) ;
       }
     };
    }

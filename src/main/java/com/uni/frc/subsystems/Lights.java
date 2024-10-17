@@ -1,5 +1,7 @@
 package com.uni.frc.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.uni.frc.Ports;
 import com.uni.frc.subsystems.Requests.Request;
 
@@ -61,7 +63,7 @@ public class Lights extends Subsystem{
     }
     @Override
     public void outputTelemetry() {
-        
+       Logger.recordOutput("Light/Color", currentColor); 
     }
     @Override
     public void stop() {

@@ -14,12 +14,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 
 import com.uni.frc.Autos.AutoBase;
-import com.uni.frc.Autos.M6;
-import com.uni.frc.Autos.MS6;
-import com.uni.frc.Autos.S4;
-import com.uni.frc.Autos.NS1;
-import com.uni.frc.Autos.S1;
-import com.uni.frc.Autos.Shoot;
+import com.uni.frc.Autos.AutoExecuter;
+import com.uni.frc.Autos.Modes.M6;
 import com.uni.frc.Controls.Controls;
 import com.uni.frc.loops.Looper;
 import com.uni.frc.subsystems.Arm;
@@ -40,19 +36,18 @@ import com.uni.frc.subsystems.Vision.OdometryLimeLight;
 import com.uni.frc.subsystems.gyros.Gyro;
 import com.uni.lib.geometry.Pose2d;
 import com.uni.lib.geometry.Rotation2d;
-import com.uni.lib.motion.PathStateGenerator;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 public class Robot extends LoggedRobot {
 
     Controls controls;
     SubsystemManager mSubsystemManager;
     SuperStructure s = SuperStructure.getInstance();
+  AutoExecuter autoExecuter = new AutoExecuter();
     SwerveDrive swerve;
     double yaw;
     OdometryLimeLight vision;
@@ -60,15 +55,13 @@ public class Robot extends LoggedRobot {
     AutoBase auto = new M6();
     public LoggedDashboardChooser<AutoBase> autoChooser = new LoggedDashboardChooser<>("AutoChooser");
     private final Looper mEnabledLooper = new Looper();
-    private final Looper mDisabledLooper = new Looper();
   
   HashMap<String,AutoBase> autos = new HashMap<String,AutoBase>();
     @Override
     public void robotInit() {
       autos.put("Middle 6", new M6());
   
-  
-      autos.put("1", new Shoot());
+      // autos.put("1", new Shoot());
   
       DriverStation.startDataLog(DataLogManager.getLog());
   
@@ -102,29 +95,29 @@ public class Robot extends LoggedRobot {
           Arm.getInstance()
           );
           mSubsystemManager.registerEnabledLoops(mEnabledLooper);
-          mSubsystemManager.registerDisabledLoops(mDisabledLooper);
       }
   
     @Override
     public void robotPeriodic() {
+      auto = autoChooser.get();
+      
       mEnabledLooper.outputToSmartDashboard();
           mSubsystemManager.outputLoopTimes();
-      Logger.recordOutput("timestamp", Timer.getFPGATimestamp());
+      SubsystemManager.getInstance().outputTelemetry();
+      OdometryLimeLight.getInstance().readInputsAndAddVisionUpdate();
     }
   
   
   
     @Override
     public void autonomousInit() {
-      auto = autoChooser.get();
       swerve = SwerveDrive.getInstance();
-      swerve.fieldzeroSwerve();
+      swerve.resetGryo(OdometryLimeLight.getInstance().getMovingAverageHeading());
       swerve.zeroModules();
       SuperStructure.getInstance().setState(SuperState.AUTO);
-      Pivot.getInstance().conformToState(Pivot.State.MAXUP);
-      Indexer.getInstance().setPiece(true);
       mEnabledLooper.start();
-      mDisabledLooper.stop();
+      autoExecuter.setAuto(new M6());
+      autoExecuter.start();
     }
   
     /** This function is called periodically during autonomous. */
@@ -136,11 +129,10 @@ public class Robot extends LoggedRobot {
     @Override
     public void teleopInit() {
       mEnabledLooper.start();
-      mDisabledLooper.stop();
       swerve = SwerveDrive.getInstance();
+      RobotStateEstimator.getInstance().resetOdometry(new Pose2d(15.18,5.48,Rotation2d.kIdentity));
       // swerve.fieldzeroSwerve();
       swerve.zeroModules();
-      RobotStateEstimator.getInstance().resetOdometry(new Pose2d(15.18,5.48,Rotation2d.kIdentity));
   
     }
   
@@ -154,18 +146,18 @@ public class Robot extends LoggedRobot {
   
     @Override
     public void disabledInit() {
+      OdometryLimeLight.getInstance().resetMovingAverageHeading();
       mSubsystemManager.stop();
       SuperStructure.getInstance().clearQueues();
       mEnabledLooper.stop();
-      mDisabledLooper.start();
-      
+      autoExecuter.stop();
+      autoExecuter = new AutoExecuter();
     }
   
     /** This function is called periodically when disabled. */
     @Override
     public void disabledPeriodic() {
-  
-  
+      RobotState.getInstance().outputTelemetry();
     }
   
     /** This function is called once when test mode is enabled. */

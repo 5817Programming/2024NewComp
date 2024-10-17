@@ -30,11 +30,22 @@ public class Twist2d implements Interpolable<Twist2d>, ICourse2d<Twist2d> {
         this.dtheta = dtheta;
     }
 
+    public Twist2d(edu.wpi.first.math.geometry.Twist2d other){
+        this(other.dx, other.dy, other.dtheta);
+    }
     public Twist2d scaled(double scale) {
         return new Twist2d(dx * scale, dy * scale, dtheta * scale);
     }
 
     public Twist2d mirror() {
+        return new Twist2d(dx, -dy, -dtheta);
+    }
+
+    public Twist2d mirrorAboutX() {
+        return new Twist2d(-dx, dy, -dtheta);
+    }
+
+    public Twist2d mirrorAboutY() {
         return new Twist2d(dx, -dy, -dtheta);
     }
 

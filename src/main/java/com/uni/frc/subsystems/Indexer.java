@@ -11,6 +11,7 @@ import com.uni.frc.Ports;
 import com.uni.frc.subsystems.Requests.Request;
 import com.uni.lib.TalonConfigs;
 
+import edu.wpi.first.networktables.TimestampedInteger;
 import edu.wpi.first.wpilibj.Timer;
 
  public class Indexer extends Subsystem {
@@ -152,7 +153,8 @@ import edu.wpi.first.wpilibj.Timer;
 
       @Override
       public boolean isFinished() {
-        return mPeriodicIO.hasPiece || Timer.getFPGATimestamp() - startTime > timeout;
+        // return false;
+        return (Timer.getFPGATimestamp() - startTime > timeout && hasPiece()) || Timer.getFPGATimestamp() - startTime > timeout+2;
       }
     };
   }
@@ -226,10 +228,10 @@ import edu.wpi.first.wpilibj.Timer;
 
    @Override
    public void outputTelemetry() {
-    Logger.recordOutput("indexer beambreak ", indexerBeamBreak.get());
-    Logger.recordOutput("indexer hasPiece ", mPeriodicIO.hasPiece);
-    Logger.recordOutput("indexer current", indexerMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput("indexer demand", mPeriodicIO.driveDemand);
+    Logger.recordOutput("Indexer/Beambreak ", indexerBeamBreak.get());
+    Logger.recordOutput("Indexer/HasPiece ", mPeriodicIO.hasPiece);
+    Logger.recordOutput("Indexer/Current", indexerMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Indexer/Demand", mPeriodicIO.driveDemand);
    }
 
    @Override

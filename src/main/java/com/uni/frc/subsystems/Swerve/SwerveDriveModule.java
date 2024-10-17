@@ -4,6 +4,7 @@
 
 package com.uni.frc.subsystems.Swerve;
 
+import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -52,7 +53,7 @@ public class SwerveDriveModule extends Subsystem {
 
     boolean rotationEncoderFlipped;
 
-    PeriodicIO mPeriodicIO = new PeriodicIO();
+     ModuleIO mPeriodicIO = new ModuleIOAutoLogged();
     
 
     /**
@@ -297,18 +298,13 @@ public class SwerveDriveModule extends Subsystem {
   }
     @Override
     public void outputTelemetry() {
-        Logger.recordOutput(this.name+" Angle Demand", rotationsToDegrees(mPeriodicIO.rotationDemand));
-        Logger.recordOutput(this.name + " Angle", rotationsToDegrees(mPeriodicIO.rotationPosition));
-        // Logger.recordOutput(this.name + " Mag Encoder Raw Value", getModuleAbsolutePosition() / 360.0);
-        Logger.recordOutput(this.name + " Absolute Position", getModuleAbsolutePosition());
-        Logger.recordOutput(this.name + " Drive Motor Demand", mPeriodicIO.driveDemand);
-        Logger.recordOutput(this.name + " Status", getModuleStatus().toString());
-        // Logger.recordOutput(this.name + " Drive Position", mPeriodicIO.drivePosition);
-        // Logger.recordOutput(this.name + "drive velocity", driveMotor.getVelocity().getValueAsDouble());
-        // Logger.recordOutput(this.name + "Drive Control Mode", mPeriodicIO.driveControlMode);
-        // Logger.recordOutput(this.name + "Rotation Control Mode", mPeriodicIO.rotationControlMode);
-        // Logger.recordOutput(this.name + "modulePose2d", Pose2d.fromTranslation(position).toWPI());
-        // Logger.recordOutput(this.name + "drive motor voltage consumption", driveMotor.getSupplyCurrent().getValueAsDouble());
+        Logger.recordOutput("Swerve/"+ this.name + "/Angle Demand", rotationsToDegrees(mPeriodicIO.rotationDemand));
+        Logger.recordOutput("Swerve/"+ this.name + "/Angle", rotationsToDegrees(mPeriodicIO.rotationPosition));
+        Logger.recordOutput("Swerve/"+ this.name + "/Absolute Position", getModuleAbsolutePosition());
+        Logger.recordOutput("Swerve/"+ this.name + "/Drive Motor Demand", mPeriodicIO.driveDemand);
+        Logger.recordOutput("Swerve/"+ this.name + "/Status", getModuleStatus().toString());
+        Logger.recordOutput("Swerve/"+ this.name + "/Drive velocity", driveMotor.getVelocity().getValueAsDouble());
+        Logger.recordOutput("Swerve/"+ this.name + "/Demanded Drive", mPeriodicIO.driveDemand);
 
 
     }
@@ -318,8 +314,8 @@ public class SwerveDriveModule extends Subsystem {
         setModuleAngle(getModuleAngle());
         setDriveOpenLoop(0.0);
     }
-
-    public static class PeriodicIO {// data
+    @AutoLog
+    public static class ModuleIO {
         double rotationPosition = 0;
         double drivePosition = 0;
         double velocity = 0;

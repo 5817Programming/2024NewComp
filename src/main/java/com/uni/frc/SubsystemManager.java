@@ -86,8 +86,6 @@ public class SubsystemManager implements ILooper {
 			}
 			write_dt = Timer.getFPGATimestamp() - (timestamp + on_loop_dt);
 
-			// Telemetry
-			outputTelemetry();
 		}
 
 		@Override
@@ -103,7 +101,6 @@ public class SubsystemManager implements ILooper {
 		@Override
 		public void onLoop(double timestamp) {
 			mAllSubsystems.forEach(Subsystem::readPeriodicInputs);
-			outputTelemetry();
 		}
 
 		@Override
