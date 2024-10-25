@@ -4,7 +4,6 @@
 
 package com.uni.frc;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 import org.littletonrobotics.junction.LoggedRobot;
@@ -23,7 +22,6 @@ import com.uni.frc.subsystems.Climb;
 import com.uni.frc.subsystems.Indexer;
 import com.uni.frc.subsystems.Intake;
 import com.uni.frc.subsystems.Lights;
-import com.uni.frc.subsystems.Music;
 import com.uni.frc.subsystems.Pivot;
 import com.uni.frc.subsystems.RobotState;
 import com.uni.frc.subsystems.RobotStateEstimator;

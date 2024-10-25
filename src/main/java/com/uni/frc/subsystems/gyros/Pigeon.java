@@ -5,7 +5,6 @@
 package com.uni.frc.subsystems.gyros;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.uni.frc.Constants;
 import com.uni.frc.Ports;
 import com.uni.lib.geometry.Twist2d;
 
@@ -27,7 +26,7 @@ public class Pigeon extends Gyro {
 
     public Pigeon() {
         try {
-            pigeon = new Pigeon2(Ports.PIGEON, Constants.isCompbot?"Minivore":"");
+            pigeon = new Pigeon2(Ports.PIGEON, "Minivore");
             // secondPigeon = new PigeonIMU(Ports.SECONDARY_PIGEON);
         } catch (Exception e) {
             System.out.println(e);

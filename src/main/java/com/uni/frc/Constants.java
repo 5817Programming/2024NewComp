@@ -38,7 +38,6 @@ public class Constants {
      * now we just want the primary one.
      */
     public static final int kPIDLoopIdx = 0;
-    public static boolean isCompbot = hasMacAddress("00:80:2F:38:8F:8B");
     /**
      * set to zero to skip waiting for confirmation, set to nonzero to wait and
      * report to DS if action fails.
@@ -97,10 +96,10 @@ public class Constants {
     // Scrub Factors
     public static final boolean kSimulateReversedCarpet = false;
     public static final double[] kWheelScrubFactors = new double[] { 1.0, 1.0, 1.0, 1.0 };
-    public static final double kXScrubFactorP = isCompbot?.95:0.85;
-    public static final double kYScrubFactorP = isCompbot?.97:.875;
-    public static final double kXScrubFactorN = isCompbot?.95:0.85;
-    public static final double kYScrubFactorN = isCompbot?.97:.875;
+    public static final double kXScrubFactorP = .95;
+    public static final double kYScrubFactorP = .97;
+    public static final double kXScrubFactorN = .95;
+    public static final double kYScrubFactorN = .97;
 
 
     public static final double driveKS = (0.32 / 12);

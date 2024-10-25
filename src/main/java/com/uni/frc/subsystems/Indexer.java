@@ -11,7 +11,6 @@ import com.uni.frc.Ports;
 import com.uni.frc.subsystems.Requests.Request;
 import com.uni.lib.TalonConfigs;
 
-import edu.wpi.first.networktables.TimestampedInteger;
 import edu.wpi.first.wpilibj.Timer;
 
  public class Indexer extends Subsystem {

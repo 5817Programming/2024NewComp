@@ -20,7 +20,6 @@ import com.uni.frc.Constants;
 import com.uni.frc.subsystems.Vision.VisionPoseAcceptor;
 import com.uni.frc.subsystems.Vision.OdometryLimeLight.VisionUpdate;
 import com.uni.lib.geometry.Pose2d;
-import com.uni.lib.geometry.Rotation2d;
 import com.uni.lib.geometry.Translation2d;
 import com.uni.lib.geometry.Twist2d;
 import com.uni.lib.util.InterpolatingDouble;

@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
-import org.littletonrobotics.junction.Logger;
 
 /** Custom PathPlanner version of SwerveControllerCommand */
 public class PathStateGenerator{

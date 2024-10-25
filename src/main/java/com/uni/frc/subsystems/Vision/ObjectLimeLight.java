@@ -6,7 +6,6 @@ package com.uni.frc.subsystems.Vision;
 
 import java.util.Optional;
 
-import org.littletonrobotics.junction.Logger;
 
 import com.uni.frc.Constants;
 import com.uni.frc.loops.ILooper;

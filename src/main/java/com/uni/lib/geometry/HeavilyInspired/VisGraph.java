@@ -9,11 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.littletonrobotics.junction.Logger;
-
-import com.uni.lib.geometry.Pose2d;
-import com.uni.lib.geometry.Rotation2d;
-
 
 public class VisGraph {
     public static VisGraph instance = null;

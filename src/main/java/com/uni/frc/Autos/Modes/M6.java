@@ -5,7 +5,6 @@ import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.uni.frc.Autos.AutoBase;
 import com.uni.frc.Autos.Actions.LambdaAction;
 import com.uni.frc.Autos.Actions.ParallelAction;
-import com.uni.frc.Autos.Actions.SeriesAction;
 import com.uni.frc.Autos.Actions.TrajectoryAction;
 import com.uni.frc.Autos.Actions.WaitAction;
 import com.uni.frc.Autos.Actions.WaitForSuperstructureAction;
@@ -17,8 +16,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 import java.util.List;
-
-import org.opencv.features2d.FastFeatureDetector;
 
 public class M6 extends AutoBase {
     SuperStructure s = SuperStructure.getInstance();

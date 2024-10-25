@@ -6,7 +6,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.uni.frc.Ports;
-import com.uni.frc.Constants.ShooterConstants;
 import com.uni.frc.subsystems.Requests.Request;
 import com.uni.lib.TalonConfigs;
 

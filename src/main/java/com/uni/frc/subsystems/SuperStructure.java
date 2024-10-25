@@ -10,10 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.uni.frc.Constants;
-import com.uni.frc.Constants.ShooterConstants;
-import com.uni.frc.Planners.DriveMotionPlanner;
 import com.uni.frc.Planners.ShootingUtils;
 import com.uni.frc.Planners.ShootingUtils.ShootingParameters;
 import com.uni.frc.loops.ILooper;
@@ -25,9 +22,7 @@ import com.uni.frc.subsystems.Swerve.SwerveDrive;
 import com.uni.frc.subsystems.Swerve.SwerveDrive.TrajectoryMode;
 import com.uni.frc.subsystems.Vision.OdometryLimeLight;
 import com.uni.lib.geometry.Pose2d;
-import com.uni.lib.geometry.Translation2d;
 import com.uni.lib.motion.PathStateGenerator;
-import com.uni.lib.swerve.ChassisSpeeds;
 import com.uni.lib.util.InterpolatingDouble;
 import com.uni.lib.util.InterpolatingTreeMap;
 

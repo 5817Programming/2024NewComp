@@ -36,7 +36,6 @@ import com.uni.lib.geometry.Twist2d;
 import com.uni.lib.motion.TrajectoryIterator;
 import com.uni.lib.swerve.ChassisSpeeds;
 import com.uni.lib.swerve.SwerveKinematics;
-import com.uni.lib.swerve.SwerveModuleState;
 import com.uni.lib.util.Util;
 
 import edu.wpi.first.math.util.Units;
@@ -201,7 +200,7 @@ boolean mOverrideTrajectory = false;
     }
 
     public void sendInput(double x, double y, double rotation) {
-        translationVector = new Translation2d(x, y).scale(speedPercent);
+        translationVector = new Translation2d(x, y).scale(0.5);
         if (Math.abs(rotation) <= rotationDeadband) {
             rotation = 0;
         }
@@ -354,7 +353,7 @@ boolean mOverrideTrajectory = false;
                             rotationCorrection = 0;
                         }
                         commandModules(inverseKinematics.updateDriveVectors(translationVector,
-                                rotationScalar, drivingPose, robotCentric));
+                                rotationScalar + rotationCorrection, drivingPose, robotCentric));
                         break;
 
                     case ALIGNMENT:

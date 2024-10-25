@@ -7,11 +7,10 @@ package com.uni.frc;
 /** Add your docs here. */
 public class Options {
     /// * REPLACE!!!!! *///
-    public static final boolean isCompbot = Constants.isCompbot;
-    public static final String encoderType = isCompbot ?  "CANCoder" : "Mag Encoder";
+    public static final String encoderType =  "CANCoder";
     public static final String motorType = "Falcon 500";
-    public static final double rotationRatio = isCompbot ? 11.3142 : 15.4285714285714;
-    public static final double driveRatio = isCompbot ? 4.41 : 6.25;
+    public static final double rotationRatio =  11.3142;
+    public static final double driveRatio =  4.41 ;
     /// * REPLACE!!!!! *////
 
 }

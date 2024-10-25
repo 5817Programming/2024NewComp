@@ -71,8 +71,8 @@ public class SwerveDriveModule extends Subsystem {
      */
     public SwerveDriveModule(int rotationMotorPort, int driveMotorPort, int moduleID, double encoderStartingPos,
             Translation2d modulePoseInches, boolean flipEncoder ,Translation2d moduleposemeters){
-        this.rotationMotor = new TalonFX(rotationMotorPort, Constants.isCompbot? "Minivore": "");
-        this.driveMotor = new TalonFX(driveMotorPort, Constants.isCompbot? "Minivore": "");
+        this.rotationMotor = new TalonFX(rotationMotorPort,  "Minivore");
+        this.driveMotor = new TalonFX(driveMotorPort,  "Minivore");
         this.moduleID = moduleID;
         this.name = "Module " + moduleID;
         this.encoderOffset = encoderStartingPos;
