@@ -114,7 +114,7 @@ public class DriveMotionPlanner {
 		PathPointState lookahead_state =
 				mCurrentTrajectory.preview(lookahead_time);
 		double actual_lookahead_distance = mSetpoint.getPose().distance(lookahead_state.getPose());
-		double adaptive_lookahead_distance = mSpeedLookahead.getLookaheadForSpeed(mSetpoint.getVelocity())
+		double adaptive_lookahead_distance = mSpeedLookahead.getLookaheadForSpeed(mSetpoint.getVelocity().norm())
 				+ kAdaptiveErrorLookaheadCoefficient * mError.getTranslation().norm();
 
 	while (actual_lookahead_distance < adaptive_lookahead_distance
@@ -133,16 +133,13 @@ public class DriveMotionPlanner {
 									.transformBy(Pose2d.fromTranslation(new Translation2d(
 													 (kPathMinLookaheadDistance - actual_lookahead_distance),
 											0.0))),
-                            lookahead_state.getCourse(),
-                            lookahead_state.getmCurvature(),
                             lookahead_state.getVelocity(),
-                            lookahead_state.getAcceleration(),
-                            lookahead_state.t(),
-							lookahead_state.getHeadingRate()
+                            lookahead_state.t()
+
 							);
 
            		}
-		if (lookahead_state.getVelocity() == 0.0) {
+		if (lookahead_state.getVelocity().norm() == 0.0) {
 			mCurrentTrajectory.advance(Double.POSITIVE_INFINITY);
 			return new ChassisSpeeds();
 		}
@@ -158,7 +155,7 @@ public class DriveMotionPlanner {
 		steeringDirection = steeringDirection.rotateBy(current_state.inverse().getRotation());
 
 		// Use the Velocity Feedforward of the Closest Point on the Trajectory
-		double normalizedSpeed = Math.abs(mSetpoint.getVelocity()) / Constants.SwerveMaxspeedMPS;
+		double normalizedSpeed = Math.abs(mSetpoint.getVelocity().norm()) / Constants.SwerveMaxspeedMPS;
 
 		// The Default Cook is the minimum speed to use. So if a feedforward speed is less than defaultCook, the robot
 		// will drive at the defaultCook speed
@@ -216,15 +213,12 @@ public class DriveMotionPlanner {
 				// RobotState.getInstance().setDisplaySetpointPose(Pose2d.fromTranslation(RobotState.getInstance().getFieldToOdom(timestamp)).transformBy(sample_point.state().state().getPose()));
 				mSetpoint = sample_point;
 
-				final double velocity_m = mSetpoint.getVelocity();
 				// Field relative
-				var course = mSetpoint.getCourse();
-				Rotation2d motion_direction = course;
 				// Adjust course by ACTUAL heading rather than planned to decouple heading and translation errors.
 
 				var chassis_speeds = new ChassisSpeeds(
-						velocity_m * motion_direction.cos(),
-						velocity_m * motion_direction.sin(),
+					mSetpoint.getVelocity().x(),
+					mSetpoint.getVelocity().y(),
 						0
 						);
 				mOutput = updatePIDChassis(chassis_speeds);

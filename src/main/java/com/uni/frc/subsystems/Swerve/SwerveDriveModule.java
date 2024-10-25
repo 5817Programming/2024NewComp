@@ -6,6 +6,7 @@ package com.uni.frc.subsystems.Swerve;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
+import com.choreo.lib.Choreo;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -32,6 +33,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
 /** Add your docs here. */
 public class SwerveDriveModule extends Subsystem {
+    
 
     TalonFX rotationMotor, driveMotor;
     Encoder rotationMagEncoder;

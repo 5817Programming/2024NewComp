@@ -8,30 +8,18 @@ import com.uni.lib.util.Util;
 
 public class PathPointState {
     protected final Pose2d mPose;
-    protected final Rotation2d mMotionDirection;
-    protected final double mCurvature;
-    protected final double mHeading_rate;
-    protected final double mVelocity;
-    protected final double mAcceleration;
+    protected final Translation2d mVelocity;
     protected final double mT;
 
     public PathPointState(){
         mPose = Pose2d.identity();
-        mMotionDirection = Rotation2d.identity();
-        mCurvature = 0;
-        mVelocity = 0;
-        mAcceleration = 0;
-        mHeading_rate = 0;
+        mVelocity = Translation2d.identity();
         mT = 0;
     }
 
-    public PathPointState(Pose2d pose, Rotation2d motion_direction, double curvature, double velocity, double acceleration, double t, double heading_rate){
-        this.mHeading_rate = heading_rate;
+    public PathPointState(Pose2d pose, Translation2d velocity,  double t){
         this.mPose = pose;
-        this.mMotionDirection = motion_direction;
-        this.mCurvature = curvature;
         this.mVelocity = velocity;
-        this.mAcceleration = acceleration;
         this.mT = t;
     }
 
@@ -40,66 +28,29 @@ public class PathPointState {
     }   
 
     public PathPointState transformBy(Pose2d transform){
-        return new PathPointState(mPose.transformBy(transform), mMotionDirection, mCurvature,mVelocity, mAcceleration, mT, mHeading_rate);
+        return new PathPointState(mPose.transformBy(transform),mVelocity,  mT);
     }
 
     public PathPointState mirror(){
-        return new PathPointState(mPose.mirror().getPose(), mMotionDirection.mirror(), -mCurvature, mVelocity, mAcceleration, mT, mHeading_rate);
+        return new PathPointState(mPose.mirror(), mVelocity.inverse(), mT);
     }
 
-    public PathPointState mirrorAboutX(double x){
-        return new PathPointState(mPose.mirrorAboutX(x), mMotionDirection.mirrorAboutX(), -mCurvature, mVelocity, mAcceleration, mT, mHeading_rate);
-    }
-
-    public PathPointState mirrorAboutY(double y){
-        return new PathPointState(mPose.mirrorAboutY(y), mMotionDirection.mirrorAboutY(), -mCurvature, mVelocity, mAcceleration, mT, mHeading_rate);
-    }
-
-    public double getmCurvature(){
-        return mCurvature;
-    }
-
-    public double getVelocity(){        
+    public Translation2d getVelocity(){        
         return mVelocity;
     }
-
-    public double getAcceleration(){
-        return mAcceleration;
-    }
-   
+  
     public Translation2d getTranslation(){
         return mPose.getTranslation();    
     }   
 
-    public PathPointState interpolate(final PathPointState other, double x) {
-        return new PathPointState(getPose().interpolate(other.getPose(), x),
-                mMotionDirection.interpolate(other.mMotionDirection, x),
-                Util.interpolate(getmCurvature(), other.getmCurvature(), x),
-                Util.interpolate(getVelocity(), other.getVelocity(), x),
-                Util.interpolate(getVelocity(), other.getVelocity(), x),
-                Util.interpolate(mT, other.t(), x),
-                Util.interpolate(getHeadingRate(), other.getHeadingRate(), x)
-                );
-    }
-
-    public double getHeadingRate(){
-        return mHeading_rate;
-    }
-    public double t(){
+   public double t(){
         return mT;
     }
-    public PathPointState rotateBy(Rotation2d rotation){
-        return new PathPointState(mPose.rotateBy(rotation), Rotation2d.identity(), mCurvature, mVelocity, mAcceleration, mT, mHeading_rate); 
-    }
-    
+   
     public PathPointState add(PathPointState other){
         return this.transformBy(other.getPose());
     }
     
-    public Rotation2d getCourse(){        
-        return mMotionDirection;
-    }
-
 
 
     

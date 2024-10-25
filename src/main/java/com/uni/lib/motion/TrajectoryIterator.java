@@ -1,5 +1,6 @@
 package com.uni.lib.motion;
 
+import com.choreo.lib.ChoreoTrajectory;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 
@@ -47,7 +48,7 @@ public class TrajectoryIterator {
         return mTimeView.sample(progress);
     }       
 
-    public PathPlannerTrajectory trajectory(){
+    public ChoreoTrajectory trajectory(){
         return mTimeView.getTrajectory();
     }
    
