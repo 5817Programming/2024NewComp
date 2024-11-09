@@ -13,7 +13,7 @@ import com.uni.lib.geometry.Rotation2d;
 import com.uni.lib.geometry.Translation2d;
 import com.uni.lib.geometry.Twist2d;
 import com.uni.lib.motion.Lookahead;
-import com.uni.lib.motion.PathPointState;
+import com.uni.lib.motion.PPPathPointState;
 import com.uni.lib.motion.TrajectoryIterator;
 import com.uni.lib.swerve.ChassisSpeeds;
 import com.uni.lib.util.ErrorTracker;
@@ -47,8 +47,8 @@ public class DriveMotionPlanner {
 	TrajectoryIterator mCurrentTrajectory;
 	boolean mIsReversed = false;
 	double mLastTime = Double.POSITIVE_INFINITY;
-	public PathPointState mLastSetpoint = null;
-	public PathPointState mSetpoint = new PathPointState();
+	public PPPathPointState mLastSetpoint = null;
+	public PPPathPointState mSetpoint = new PPPathPointState();
 	Pose2d mError = Pose2d.identity();
 
 	ErrorTracker mErrorTracker = new ErrorTracker(14 * 100);
@@ -111,10 +111,10 @@ public class DriveMotionPlanner {
 	protected ChassisSpeeds updatePurePursuit(Pose2d current_state, double feedforwardOmegaRadiansPerSecond) {
 		double lookahead_time = kPathLookaheadTime;
 		final double kLookaheadSearchDt = 0.01;
-		PathPointState lookahead_state =
+		PPPathPointState lookahead_state =
 				mCurrentTrajectory.preview(lookahead_time);
 		double actual_lookahead_distance = mSetpoint.getPose().distance(lookahead_state.getPose());
-		double adaptive_lookahead_distance = mSpeedLookahead.getLookaheadForSpeed(mSetpoint.getVelocity().norm())
+		double adaptive_lookahead_distance = mSpeedLookahead.getLookaheadForSpeed(mSetpoint.getVelocity())
 				+ kAdaptiveErrorLookaheadCoefficient * mError.getTranslation().norm();
 
 	while (actual_lookahead_distance < adaptive_lookahead_distance
@@ -127,19 +127,22 @@ public class DriveMotionPlanner {
 		// If the Lookahead Point's Distance is less than the Lookahead Distance transform it so it is the lookahead
 		// distance away
 		if (actual_lookahead_distance < adaptive_lookahead_distance) {
-			lookahead_state = new PathPointState(
+			lookahead_state = new PPPathPointState(
  							lookahead_state
 									.getPose()
 									.transformBy(Pose2d.fromTranslation(new Translation2d(
 													 (kPathMinLookaheadDistance - actual_lookahead_distance),
 											0.0))),
+                            lookahead_state.getCourse(),
+                            lookahead_state.getmCurvature(),
                             lookahead_state.getVelocity(),
-                            lookahead_state.t()
-
+                            lookahead_state.getAcceleration(),
+                            lookahead_state.t(),
+							lookahead_state.getHeadingRate()
 							);
 
            		}
-		if (lookahead_state.getVelocity().norm() == 0.0) {
+		if (lookahead_state.getVelocity() == 0.0) {
 			mCurrentTrajectory.advance(Double.POSITIVE_INFINITY);
 			return new ChassisSpeeds();
 		}
@@ -155,7 +158,7 @@ public class DriveMotionPlanner {
 		steeringDirection = steeringDirection.rotateBy(current_state.inverse().getRotation());
 
 		// Use the Velocity Feedforward of the Closest Point on the Trajectory
-		double normalizedSpeed = Math.abs(mSetpoint.getVelocity().norm()) / Constants.SwerveMaxspeedMPS;
+		double normalizedSpeed = Math.abs(mSetpoint.getVelocity()) / Constants.SwerveMaxspeedMPS;
 
 		// The Default Cook is the minimum speed to use. So if a feedforward speed is less than defaultCook, the robot
 		// will drive at the defaultCook speed
@@ -197,7 +200,7 @@ public class DriveMotionPlanner {
 		if (!Double.isFinite(mLastTime)) mLastTime = timestamp;
 		mDt = timestamp - mLastTime;
 		mLastTime = timestamp;
-		PathPointState sample_point;
+		PPPathPointState sample_point;
 		mCurrentState = current_state;
 
 			// Compute error in robot frame
@@ -209,16 +212,18 @@ public class DriveMotionPlanner {
             switch (mFollowerType) {
 				case PID:
  				sample_point = mCurrentTrajectory.advance(mDt);
-				System.out.println("Ran");
 				// RobotState.getInstance().setDisplaySetpointPose(Pose2d.fromTranslation(RobotState.getInstance().getFieldToOdom(timestamp)).transformBy(sample_point.state().state().getPose()));
 				mSetpoint = sample_point;
 
+				final double velocity_m = mSetpoint.getVelocity();
 				// Field relative
+				var course = mSetpoint.getCourse();
+				Rotation2d motion_direction = course;
 				// Adjust course by ACTUAL heading rather than planned to decouple heading and translation errors.
 
 				var chassis_speeds = new ChassisSpeeds(
-					mSetpoint.getVelocity().x(),
-					mSetpoint.getVelocity().y(),
+						velocity_m * motion_direction.cos(),
+						velocity_m * motion_direction.sin(),
 						0
 						);
 				mOutput = updatePIDChassis(chassis_speeds);
@@ -275,7 +280,7 @@ public class DriveMotionPlanner {
 				.distance(current_state);
 	}
 
-	public synchronized PathPointState getSetpoint() {
+	public synchronized PPPathPointState getSetpoint() {
 		return mSetpoint;
 	}
 

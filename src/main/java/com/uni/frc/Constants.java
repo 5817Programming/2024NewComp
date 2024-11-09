@@ -223,22 +223,23 @@ public static final double kLooperDt = 0.02;
 
     public static final class PivotConstants {
         public static final double SPEAKER = 0;
-        public static final double AMP = 12.5;
+        public static final double AMP = 5;
         public static final double TRAP = 0;
         public static final double TRANSFER = 0;
         public static final double SHOOTING = 0;
-        public static final double MAX_UP = 30*1.45;
+        public static final double MAX_UP = 26.0;
         public static final double MAX_DOWN = 0;
-        public static final double INTAKING = 10;
+        public static final double INTAKING = 5;
 
-        public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> SpeakerAngleMap = new InterpolatingTreeMap<>();
+        public 
+        static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> SpeakerAngleMap = new InterpolatingTreeMap<>();
         static{
-            SpeakerAngleMap.put(new InterpolatingDouble(1.1), new InterpolatingDouble(43.375));
-            SpeakerAngleMap.put(new InterpolatingDouble(2.11), new InterpolatingDouble(26.0));
-            SpeakerAngleMap.put(new InterpolatingDouble(2.9), new InterpolatingDouble(17.1));
-            SpeakerAngleMap.put(new InterpolatingDouble(3.63), new InterpolatingDouble(10.563));
-            SpeakerAngleMap.put(new InterpolatingDouble(4.3), new InterpolatingDouble(6.5625));
-            SpeakerAngleMap.put(new InterpolatingDouble(5.0), new InterpolatingDouble(2.51875));
+            SpeakerAngleMap.put(new InterpolatingDouble(1.1), new InterpolatingDouble(26.5));
+            SpeakerAngleMap.put(new InterpolatingDouble(2.11), new InterpolatingDouble(18.5));
+            SpeakerAngleMap.put(new InterpolatingDouble(3.08), new InterpolatingDouble(10.65));
+            SpeakerAngleMap.put(new InterpolatingDouble(3.71), new InterpolatingDouble(6.35));
+            SpeakerAngleMap.put(new InterpolatingDouble(4.67), new InterpolatingDouble(2.5));
+            SpeakerAngleMap.put(new InterpolatingDouble(5.5), new InterpolatingDouble(0.0));
 
        }
         public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> LobAngleMap = new InterpolatingTreeMap<>();

@@ -21,11 +21,13 @@ public class M6 extends AutoBase {
     SuperStructure s = SuperStructure.getInstance();
     SwerveDrive mSwerve = SwerveDrive.getInstance();
     double initRotation = 1;
-    PathPlannerPath path = PathPlannerPath.fromPathFile("StartToClose1");
-    PathPlannerPath path1 = PathPlannerPath.fromPathFile("Close1ToClose2");
-    PathPlannerPath path2 = PathPlannerPath.fromPathFile("Close2ToClose3");
-    PathPlannerPath path3 = PathPlannerPath.fromPathFile("Close3ToFar1");
-    PathPlannerPath path4 = PathPlannerPath.fromPathFile("Far1ToShot1");
+    PathPlannerPath path = PathPlannerPath.fromPathFile("StartTo0.5");
+    PathPlannerPath path1 = PathPlannerPath.fromPathFile("0.5ToClose1");
+
+    PathPlannerPath path2 = PathPlannerPath.fromPathFile("Close1ToClose2");
+    PathPlannerPath path3 = PathPlannerPath.fromPathFile("Close2ToClose3");
+    PathPlannerPath path4 = PathPlannerPath.fromPathFile("Close3ToFar2");
+    PathPlannerPath path5 = PathPlannerPath.fromPathFile("Far1ToShot1");
     
 
     PathPlannerTrajectory trajectory = addTrajectory(path.getTrajectory(new ChassisSpeeds(), Rotation2d.fromDegrees(initRotation)));
@@ -33,39 +35,40 @@ public class M6 extends AutoBase {
     PathPlannerTrajectory trajectory2 = addTrajectory(path2.getTrajectory(new ChassisSpeeds(), Rotation2d.fromDegrees(initRotation)));
     PathPlannerTrajectory trajectory3 = addTrajectory(path3.getTrajectory(new ChassisSpeeds(), Rotation2d.fromDegrees(initRotation)));
     PathPlannerTrajectory trajectory4 = addTrajectory(path4.getTrajectory(new ChassisSpeeds(), Rotation2d.fromDegrees(initRotation)));
+    PathPlannerTrajectory trajectory5 = addTrajectory(path5.getTrajectory(new ChassisSpeeds(), Rotation2d.fromDegrees(initRotation)));
 
 
     @Override
     public void routine() {
-        Pivot.getInstance().conformToState(Pivot.State.MAXUP);
-        Shooter.getInstance().conformToState(Shooter.State.PARTIALRAMP);
-        runAction(new WaitAction(1));
+       s.setContinuousShoot(true);
+       runAction(new TrajectoryAction(trajectory));
+       runAction(new WaitAction(.5));
         runAction(new LambdaAction(() -> s.shootState(false)));
-        runAction(new WaitAction(1));
-        s.setContinuousShoot(true);
+        runAction(new WaitAction(0.3));
         runAction(new ParallelAction(List.of(
-            new TrajectoryAction(trajectory, true),
+            new TrajectoryAction(trajectory1, true),
             new LambdaAction(() -> s.intakeState(2))
             )));
-        runAction(new WaitAction(1));
+        runAction(new WaitAction(.8));
         runAction(new LambdaAction(() -> s.shootState(false)));
-        runAction(new WaitForSuperstructureAction(1));
-        runAction(new WaitAction(.5));
-        runAction(new ParallelAction(List.of(
-            new TrajectoryAction(trajectory1),
-            new LambdaAction(() -> s.intakeState(2))
-            )));
-        runAction(new WaitAction(1));
-        runAction(new LambdaAction(() -> s.shootState(false)));
-        runAction(new WaitForSuperstructureAction(1));
-        runAction(new WaitAction(.5));
+        runAction(new WaitAction(0.3));
         runAction(new ParallelAction(List.of(
             new TrajectoryAction(trajectory2),
-            new LambdaAction(() -> s.intakeState(2))
+            new LambdaAction(() -> s.intakeState(4))
             )));
-        runAction(new WaitAction(1));
+        runAction(new WaitAction(.5));
         runAction(new LambdaAction(() -> s.shootState(false)));
         runAction(new WaitForSuperstructureAction(1));
+        runAction(new WaitAction(.5));
+        runAction(new ParallelAction(List.of(
+            new TrajectoryAction(trajectory3),
+            new LambdaAction(() -> s.intakeState(4))
+            )));
+        runAction(new WaitAction(0.8));
+        runAction(new LambdaAction(() -> s.shootState(false)));
+        runAction(new WaitForSuperstructureAction(1));
+        runAction(new WaitAction(.5));
+        runAction(new TrajectoryAction(trajectory4));
        // runAction(new ParallelAction(List.of(
         //     new LambdaAction(()->s.intakeState(1)),
         //     new SeriesAction(

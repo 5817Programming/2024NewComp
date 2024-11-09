@@ -93,6 +93,7 @@ public class Robot extends LoggedRobot {
           Arm.getInstance()
           );
           mSubsystemManager.registerEnabledLoops(mEnabledLooper);
+          mEnabledLooper.start();
       }
   
     @Override
@@ -110,10 +111,8 @@ public class Robot extends LoggedRobot {
     @Override
     public void autonomousInit() {
       swerve = SwerveDrive.getInstance();
-      swerve.resetGryo(OdometryLimeLight.getInstance().getMovingAverageHeading());
       swerve.zeroModules();
       SuperStructure.getInstance().setState(SuperState.AUTO);
-      mEnabledLooper.start();
       autoExecuter.setAuto(new M6());
       autoExecuter.start();
     }
@@ -126,9 +125,7 @@ public class Robot extends LoggedRobot {
     /** This function is called once when teleop is enabled. */  
     @Override
     public void teleopInit() {
-      mEnabledLooper.start();
       swerve = SwerveDrive.getInstance();
-      RobotStateEstimator.getInstance().resetOdometry(new Pose2d(15.18,5.48,Rotation2d.kIdentity));
       // swerve.fieldzeroSwerve();
       swerve.zeroModules();
   
@@ -144,10 +141,8 @@ public class Robot extends LoggedRobot {
   
     @Override
     public void disabledInit() {
-      OdometryLimeLight.getInstance().resetMovingAverageHeading();
       mSubsystemManager.stop();
       SuperStructure.getInstance().clearQueues();
-      mEnabledLooper.stop();
       autoExecuter.stop();
       autoExecuter = new AutoExecuter();
     }
@@ -156,6 +151,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void disabledPeriodic() {
       RobotState.getInstance().outputTelemetry();
+      swerve.resetGryo(OdometryLimeLight.getInstance().getMovingAverageHeading());
     }
   
     /** This function is called once when test mode is enabled. */

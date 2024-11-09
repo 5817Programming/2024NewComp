@@ -16,8 +16,8 @@ import com.uni.frc.Constants.ElevatorConstants;
 
   public class Climb extends Subsystem {
     private PeriodicIO mPeriodicIO = new PeriodicIO();
-    private TalonFX elevatorMotor1 = new TalonFX(Ports.elevatorMotor1,"Minivore");
-    private TalonFX elevatorMotor2 = new TalonFX(Ports.elevatorMotor2,"Minivore");
+    private TalonFX elevatorMotor1 = new TalonFX(Ports.elevatorMotor1);
+    private TalonFX elevatorMotor2 = new TalonFX(Ports.elevatorMotor2);
     
     private TalonFXConfiguration elevator1Config = TalonConfigs.elevatorConfigs();
 

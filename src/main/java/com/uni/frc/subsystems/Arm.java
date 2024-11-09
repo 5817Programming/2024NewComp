@@ -17,7 +17,7 @@ import com.uni.lib.TalonConfigs;
 public class Arm extends Subsystem {
   
   private PeriodicIO mPeriodicIO = new PeriodicIO();
-  private TalonFX armMotor = new TalonFX(Ports.Arm,"Minivore");
+  // private TalonFX armMotor = new TalonFX(Ports.Arm);
   private TalonFXConfiguration pivotConfig = TalonConfigs.armConfigs();
 
   
@@ -51,14 +51,14 @@ public class Arm extends Subsystem {
   }
 
   public void setRamp(double rampTime) {
-    armMotor.getConfigurator().refresh(pivotConfig);
+    // armMotor.getConfigurator().refresh(pivotConfig);
     pivotConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = rampTime;
-    armMotor.getConfigurator().apply(pivotConfig);
+    // armMotor.getConfigurator().apply(pivotConfig);
   }
 
   public void configMotors() {
     pivotConfig = TalonConfigs.swerveDriveConfig();
-    armMotor.getConfigurator().apply(pivotConfig);
+    // armMotor.getConfigurator().apply(pivotConfig);
   }
 
   public void setMotionMagic(double position){
@@ -86,11 +86,11 @@ public class Arm extends Subsystem {
   }
 
   public void motionMagic(){
-    armMotor.setControl(new MotionMagicVoltage(-mPeriodicIO.rotationDemand));
+    // armMotor.setControl(new MotionMagicVoltage(-mPeriodicIO.rotationDemand));
   }
 
   public void setPercent(){
-    armMotor.setControl(new DutyCycleOut(-mPeriodicIO.rotationDemand, true, false, false, false));
+    // armMotor.setControl(new DutyCycleOut(-mPeriodicIO.rotationDemand, true, false, false, false));
      
   }
 
@@ -141,9 +141,9 @@ public class Arm extends Subsystem {
 
   @Override
   public void writePeriodicOutputs() {
-    mPeriodicIO.rotationPosition = armMotor.getPosition().getValueAsDouble();
-    mPeriodicIO.velocity = armMotor.getVelocity().getValueAsDouble();
-    mPeriodicIO.statorCurrent = armMotor.getStatorCurrent().getValueAsDouble();
+    // mPeriodicIO.rotationPosition = armMotor.getPosition().getValueAsDouble();
+    // mPeriodicIO.velocity = armMotor.getVelocity().getValueAsDouble();
+    // mPeriodicIO.statorCurrent = armMotor.getStatorCurrent().getValueAsDouble();
   }
 
   @Override

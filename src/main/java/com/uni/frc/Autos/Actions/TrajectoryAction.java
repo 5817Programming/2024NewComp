@@ -8,7 +8,8 @@ import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.uni.frc.subsystems.RobotStateEstimator;
 import com.uni.frc.subsystems.Swerve.SwerveDrive;
 import com.uni.frc.subsystems.Swerve.SwerveDrive.State;
-import com.uni.lib.motion.TimeView;
+import com.uni.lib.motion.ChorTimeView;
+import com.uni.lib.motion.PPTimeView;
 import com.uni.lib.motion.TrajectoryIterator;
 
 
@@ -25,7 +26,7 @@ public class TrajectoryAction implements Action{
 	}
 
 	public TrajectoryAction(PathPlannerTrajectory path, boolean resetPos){
-		this.mTrajectory = new TrajectoryIterator(new TimeView(path));
+		this.mTrajectory = new TrajectoryIterator(new PPTimeView(path));
 		this.mResetGyro = resetPos;
 		this.mDrive = SwerveDrive.getInstance();
 	}
@@ -33,7 +34,6 @@ public class TrajectoryAction implements Action{
 	@Override
 	public void start(){
 		if(mResetGyro){
-			RobotStateEstimator.getInstance().resetOdometry(mTrajectory.getCurrentState().getPose());
 			Logger.recordOutput("TrajectoryAction/ResetOdometry", mTrajectory.getCurrentState().getPose().toWPI());
 		}
 		

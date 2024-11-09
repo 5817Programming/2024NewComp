@@ -11,7 +11,7 @@
 
   public class Intake extends Subsystem {
     private PeriodicIO mPeriodicIO = new PeriodicIO();
-    private TalonFX intakeMotor = new TalonFX(Ports.Intake, "Minivore");
+    private TalonFX intakeMotor = new TalonFX(Ports.Intake);
     private TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
 
 
@@ -32,10 +32,10 @@
 
 
     public enum State {
-      INTAKING(-1),
-      OUTTAKING(0.7),
+      INTAKING(.75),
+      OUTTAKING(-0.7),
       OFF(0), 
-      PARTIALRAMP(-0);
+      PARTIALREV(-.03);
 
       double output = 0;
 
@@ -51,6 +51,7 @@
     }
 
     public void configMotors() {
+      intakeMotor.setInverted(false);
       intakeConfig = TalonConfigs.intakeConfigs();
       intakeMotor.getConfigurator().apply(intakeConfig);
     }

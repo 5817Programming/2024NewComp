@@ -9,14 +9,14 @@ import com.uni.lib.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
-public class TimeView {
+public class ChorTimeView {
 
     private ChoreoTrajectory mTrajectory;
     private double start_t;
     private double end_t;
 
 
-    public TimeView(ChoreoTrajectory path){
+    public ChorTimeView(ChoreoTrajectory path){
         this.mTrajectory = path;
         this.start_t = 0;
         this.end_t = path.getTotalTime();
@@ -29,7 +29,7 @@ public class TimeView {
         return end_t;
     }
 
-    public PathPointState sample(double t){
+    public ChorPathPointState sample(double t){
         ChoreoTrajectoryState state = mTrajectory.sample(t);
         if(DriverStation.getAlliance().get().equals(Alliance.Red))
             state = state.flipped();
@@ -37,7 +37,7 @@ public class TimeView {
         Pose2d pose = new Pose2d(state.getPose());
         Translation2d velocity = new Translation2d(state.velocityX,state.velocityY);
 
-        return new PathPointState(pose, velocity, t);
+        return new ChorPathPointState(pose, velocity, t);
     }
 
     public ChoreoTrajectory getTrajectory(){        

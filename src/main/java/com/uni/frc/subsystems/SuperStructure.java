@@ -548,10 +548,10 @@ public class SuperStructure extends Subsystem {
                 mIntake.stateRequest(Intake.State.INTAKING),
                 mIndexer.stateRequest(Indexer.State.RECIEVING),
                 mIndexer.hasPieceRequest(false),
-                waitRequest(.03),
+                mIntake.stateRequest(Intake.State.OFF),
                 mLights.setColorRequest(Color.INTAKED),
-                mIndexer.stateRequest(Indexer.State.OFF),
-                mIntake.stateRequest(Intake.State.OFF)), false);
+                mIndexer.stateRequest(Indexer.State.OFF)),
+                 false);
         request(request);
     }
 
@@ -610,13 +610,13 @@ public class SuperStructure extends Subsystem {
         if (Override) {
             RequestList queue = new RequestList(Arrays.asList(
                     logCurrentRequest("Shoot State"),
-                    mShooter.atTargetRequest(),
-                    mPivot.atTargetRequest(),
+                    // mShooter.atTargetRequest(),
+                    // mPivot.atTargetRequest(),
                     mLights.setColorRequest(Color.LOCKED),
-                    mIntake.stateRequest(Intake.State.INTAKING),
                     mIndexer.stateRequest(Indexer.State.TRANSFERING),
+                    mIntake.stateRequest(Intake.State.PARTIALREV),
                     mLights.setColorRequest(Color.SHOOTING),
-                    mIndexer.hasNoPieceRequest(0.4),
+                    mIndexer.hasNoPieceRequest(0.6),
                     mShooter.stateRequest(Shooter.State.IDLE),
                     mIndexer.setHasPieceRequest(false)), false);
             request(queue);
@@ -624,12 +624,13 @@ public class SuperStructure extends Subsystem {
             RequestList queue = new RequestList(Arrays.asList(
                     logCurrentRequest("Shoot State"),
                     mLights.setColorRequest(Color.AIMING),
-                    // mPivot.atTargetRequest(),
+                    mPivot.atTargetRequest(),
                     mLights.setColorRequest(Color.SHOOTING),
                     mIndexer.stateRequest(Indexer.State.TRANSFERING),
                     waitRequest(0.4),
                     mIndexer.stateRequest(Indexer.State.OFF),
-                    mIndexer.setHasPieceRequest(false)), false);
+                    mIndexer.setHasPieceRequest(false)),
+                    false);
             queue(queue);
         }
     }
@@ -733,6 +734,8 @@ public class SuperStructure extends Subsystem {
 
     @Override
     public void outputTelemetry() {
+        Logger.recordOutput("SuperStructure/Superstate", currentState);
+        Logger.recordOutput("SuperStructure/ScoreState", currentMode);
         Logger.recordOutput("Pivot Offset", pivotOffset);
         Logger.recordOutput("Countinuous Shoot", continuousShoot);
         Logger.recordOutput("SuperStructure/RequestsCompleted", requestsCompleted());

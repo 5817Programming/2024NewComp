@@ -306,7 +306,6 @@ public class SwerveDriveModule extends Subsystem {
         Logger.recordOutput("Swerve/"+ this.name + "/Drive Motor Demand", mPeriodicIO.driveDemand);
         Logger.recordOutput("Swerve/"+ this.name + "/Status", getModuleStatus().toString());
         Logger.recordOutput("Swerve/"+ this.name + "/Drive velocity", driveMotor.getVelocity().getValueAsDouble());
-        Logger.recordOutput("Swerve/"+ this.name + "/Demanded Drive", mPeriodicIO.driveDemand);
 
 
     }

@@ -18,12 +18,13 @@ import com.uni.frc.subsystems.Requests.Request;
 import com.uni.lib.LoggedTunableNumber;
 import com.uni.lib.TalonConfigs;
 
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
+
 public class Pivot extends Subsystem {
   private PeriodicIOAutoLogged mPeriodicIO = new PeriodicIOAutoLogged();
-  private TalonFX pivotMotor1 = new TalonFX(Ports.Pivot1, "Minivore");
-  private TalonFX pivotMotor2 = new TalonFX(Ports.Pivot2, "Minivore");
+  private TalonFX pivotMotor1 = new TalonFX(Ports.Pivot1);
 
-  private CANcoder encoder = new CANcoder(Ports.PivotEncoder, "Minivore");
+  private CANcoder encoder = new CANcoder(Ports.PivotEncoder);
   private TalonFXConfiguration pivotConfig = new TalonFXConfiguration();
   private LoggedTunableNumber tunableP = new LoggedTunableNumber("pivot/p");
   private LoggedTunableNumber tunableG = new LoggedTunableNumber("pivot/g");
@@ -86,7 +87,6 @@ public class Pivot extends Subsystem {
     tunableG.initDefault(pivotConfig.Slot0.kG);
     // tunableP.initDefault(pivotConfig.Slot0.kP);
     pivotMotor1.setNeutralMode(NeutralModeValue.Brake);
-    pivotMotor2.setNeutralMode(NeutralModeValue.Brake);
   }
 
   public void setMotionMagic(double position) {
@@ -101,7 +101,6 @@ public class Pivot extends Subsystem {
   }
 
   public boolean atTarget() {
-    System.out.println(Math.abs(mPeriodicIO.rotationDemand - mPeriodicIO.rotationPosition));
     return Math.abs(mPeriodicIO.rotationDemand - mPeriodicIO.rotationPosition) < 2;
   }
 
@@ -115,7 +114,6 @@ public class Pivot extends Subsystem {
 
   public void motionMagic() {// .299 is og zero
     pivotMotor1.setControl(new MotionMagicVoltage(mPeriodicIO.rotationDemand));
-    pivotMotor2.setControl(new Follower(Ports.Pivot1, false));
 
   }
 
@@ -174,12 +172,7 @@ public class Pivot extends Subsystem {
       }
       @Override
       public void onLoop(double timestamp) {
-        if(tunableP.hasChanged(hashCode())||tunableG.hasChanged(hashCode())){ 
-          pivotConfig.Slot0.kP = tunableP.get();
-          pivotConfig.Slot0.kG = tunableG.get();
-          pivotMotor1.getConfigurator().apply(pivotConfig);
-        }
-      }
+     }
       @Override
       public void onStop(double timestamp) {
       }
@@ -208,6 +201,12 @@ public class Pivot extends Subsystem {
 
   @Override
   public void outputTelemetry() {
+    Logger.recordOutput("Pivot/Sticky Fault Flags Code", pivotMotor1.getStickyFaultField().getValue());
+    Logger.recordOutput("Pivot/Motor Temp", pivotMotor1.getDeviceTemp().getValue());
+    Logger.recordOutput("Pivot/Reported Error", pivotMotor1.getClosedLoopError().getValue()); 
+    Logger.recordOutput("Pivot/Supply Voltage", pivotMotor1.getSupplyVoltage().getValue());
+    Logger.recordOutput("Pivot/StatorCurrent", pivotMotor1.getStatorCurrent().getValue());
+    Logger.recordOutput("Pivot/SupplyCurrent", pivotMotor1.getSupplyCurrent().getValue());
     Logger.recordOutput("Pivot/Position", pivotMotor1.getPosition().getValue() * 360);
     Logger.recordOutput("Pivot/Absolute Position", encoder.getAbsolutePosition().getValue());
     Logger.recordOutput("Pivot/Demand", mPeriodicIO.rotationDemand);
@@ -225,6 +224,6 @@ public class Pivot extends Subsystem {
     double velocity = 0;
     double statorCurrent = 0;
 
-    double rotationDemand = -.07;
+    double rotationDemand = 0;
   }
 }

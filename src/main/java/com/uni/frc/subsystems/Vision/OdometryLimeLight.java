@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import org.littletonrobotics.junction.Logger;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 
@@ -49,7 +50,7 @@ public class OdometryLimeLight extends Subsystem {
   private Mat mDistortionCoeffients = new Mat(1, 5, CV_64FC1);
 
   private boolean mOutputsHaveChanged = true;
-  private MovingAverage movingAverage = new MovingAverage(100);
+  private MovingAverage movingAverage = new MovingAverage(1000);
   private static HashMap<Integer, AprilTag> mTagMap = FieldLayout.Red.kAprilTagMap;
 
   public static OdometryLimeLight getInstance() {
@@ -109,11 +110,16 @@ public class OdometryLimeLight extends Subsystem {
     mPeriodicIO.ta = table.getEntry("ta").getDouble(0);
     LimelightHelpers.SetRobotOrientation("limelight-up", 180-Pigeon.getInstance().getAngle(), 0, 0, 0, 0, 0);
     Pose2d mt2 = new Pose2d(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-up").pose);
+
     Pose2d mt = new Pose2d(LimelightHelpers.getBotPose2d_wpiBlue("limelight-up"));
-    movingAverage.addNumber(mt.getRotation().flip().getDegrees());
+    
 
     int tagId = mPeriodicIO.tagId;
     if (mPeriodicIO.seesTarget) {
+          Logger.recordOutput("SizeOfAvg", movingAverage.getSize());
+          if(movingAverage.getSize()==999)
+            System.out.println("Ready");
+          movingAverage.addNumber(mt.getRotation().flip().getDegrees());
       if (mt2 != Pose2d.identity() && mPeriodicIO.useVision) {
         mPeriodicIO.visionUpdate = Optional 
             .of(new VisionUpdate(timestamp - mPeriodicIO.latency, mt2));
@@ -138,7 +144,7 @@ public class OdometryLimeLight extends Subsystem {
   }
 
   public void resetMovingAverageHeading(){
-    movingAverage = new MovingAverage(100);
+    movingAverage = new MovingAverage(1000);
   }
 
 

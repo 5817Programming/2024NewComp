@@ -6,11 +6,11 @@ import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 public class TrajectoryIterator {
 
-    protected TimeView mTimeView;
+    protected PPTimeView mTimeView;
     protected double progress_ = 0.0;
-    protected PathPointState currentState_;
+    protected PPPathPointState currentState_;
 
-    public TrajectoryIterator(TimeView timeView){
+    public TrajectoryIterator(PPTimeView timeView){
         this.mTimeView = timeView;
         this.currentState_ = timeView.sample(timeView.first_interpolant());
         progress_ = timeView.first_interpolant();
@@ -26,11 +26,11 @@ public class TrajectoryIterator {
        return Math.max(0.0, mTimeView.last_interpolant() - progress_);
    }
 
-   public PathPointState getCurrentState(){
+   public PPPathPointState getCurrentState(){
        return currentState_;
    }
 
-   public PathPointState advance(double additional_progress){
+   public PPPathPointState advance(double additional_progress){
 
         progress_ = Math.max(mTimeView.first_interpolant(), Math.min(mTimeView.last_interpolant(), progress_ + additional_progress));
 
@@ -38,17 +38,17 @@ public class TrajectoryIterator {
         return currentState_;
    }    
 
-   public TimeView getTimeView(){
+   public PPTimeView getTimeView(){
        return mTimeView;
    }
 
-    public PathPointState preview(double additional_progress){
+    public PPPathPointState preview(double additional_progress){
         final double progress = Math.max(mTimeView.first_interpolant(), Math.min(mTimeView.last_interpolant(), progress_ + additional_progress));
 
         return mTimeView.sample(progress);
     }       
 
-    public ChoreoTrajectory trajectory(){
+    public PathPlannerTrajectory trajectory(){
         return mTimeView.getTrajectory();
     }
    

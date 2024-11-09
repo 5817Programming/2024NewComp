@@ -16,7 +16,6 @@ public class TargetPiecePlanner {
 
     public double updateAiming(double timeStamp,Optional<VisionObjectUpdate> visionupdate, HeadingController headingController, Rotation2d currentHeading){
         if(visionupdate.isEmpty()){
-            System.out.println("visionempty");
             return 0;
         }
         double objectYDegreesCamera = visionupdate.get().getCameraToTarget().x();

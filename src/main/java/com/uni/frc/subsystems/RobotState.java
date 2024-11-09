@@ -213,7 +213,6 @@ public class RobotState {
     public synchronized Translation2d getLatestVisionPoseComponent() {
         return getAbsoluteVisionPoseComponent(visionPoseComponent.lastKey().value);
     }
-
     /**
      * Get Current Field to Vehicle using Filter Idea 1 (Offset Space) => Add the Offset outputted by the Filter to Current Odom
      * @param timestamp
@@ -246,7 +245,7 @@ public class RobotState {
         Logger.recordOutput("RobotState/Robot Velocity", getMeasuredVelocity().toString());
         Logger.recordOutput("RobotState/PoseFromOdometry",  new Pose2d(getLatestPoseFromOdom().getValue().getTranslation(), getLatestPoseFromOdom().getValue().getRotation().inverse()).toWPI());
         Logger.recordOutput("RobotState/Vision Pose Component", getAbsoluteVisionPoseComponent(Timer.getFPGATimestamp()).toWPI());
-        Logger.recordOutput("RobotState/Filtered Pose", new Pose2d(getKalmanPose(Timer.getFPGATimestamp()).getTranslation(), getKalmanPose(Timer.getFPGATimestamp()).getRotation().inverse()).toWPI());
+        Logger.recordOutput("RobotState/Filtered Pose", new Pose2d(getLatestKalmanPose().getTranslation(), getLatestKalmanPose().getRotation().inverse()).toWPI());
         Logger.recordOutput("RobotState/SetPoint Pose", mSetpointPose.toWPI());
         Logger.recordOutput("RobotState/Vision Pose", getDisplayVisionPose().toWPI());
    }

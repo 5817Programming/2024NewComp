@@ -200,7 +200,7 @@ boolean mOverrideTrajectory = false;
     }
 
     public void sendInput(double x, double y, double rotation) {
-        translationVector = new Translation2d(x, y).scale(0.5);
+        translationVector = new Translation2d(x, y);
         if (Math.abs(rotation) <= rotationDeadband) {
             rotation = 0;
         }

@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.ejml.simple.SimpleMatrix;
+import org.littletonrobotics.junction.Logger;
 
 import com.uni.frc.Constants;
 import com.uni.frc.subsystems.Swerve.SwerveDriveModule;
@@ -78,7 +79,6 @@ public class SwerveKinematics {
         for(int i = 0; i < m_numModules; i++) {
             driveVectors.add(translationVector.translateBy(moduleRotationVectors.get(i).scale(rotationalMagnitude))); //Rotates the translation vector of each of the modules, by the rotation value
         }
-
         double maxMagnitude = 1.0;
         for (Translation2d m : driveVectors) {
             double moduleVectorMagnitude = m.norm();

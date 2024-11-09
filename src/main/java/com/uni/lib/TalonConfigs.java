@@ -6,6 +6,7 @@ package com.uni.lib;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.uni.frc.Constants;
 import com.uni.frc.Ports;
 
@@ -46,23 +47,25 @@ public class TalonConfigs {
 
     public static TalonFXConfiguration pivotConfigs() {
         TalonFXConfiguration driveConfigs = new TalonFXConfiguration(); 
-        driveConfigs.Slot0.kV = -0;
+        driveConfigs.Slot0.kV = 0;
         driveConfigs.Slot0.kS = 0;
         driveConfigs.Slot0.kA = 0;
-        driveConfigs.Slot0.kP = -100;
+        driveConfigs.Slot0.kP = -80;
         driveConfigs.Slot0.kI = 0;
         driveConfigs.Slot0.kD = 0;
-        driveConfigs.Slot0.kG = -.3;
+        driveConfigs.Slot0.kG = -.23;
         driveConfigs.Feedback.FeedbackRemoteSensorID = Ports.PivotEncoder;
-        driveConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+        driveConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
         
 
         driveConfigs.OpenLoopRamps.DutyCycleOpenLoopRampPeriod =.5; 
         driveConfigs.CurrentLimits.StatorCurrentLimit = 40;
-        driveConfigs.CurrentLimits.SupplyCurrentLimit = 45;
+        driveConfigs.CurrentLimits.SupplyCurrentLimit = 20;
+        driveConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+        driveConfigs.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-        driveConfigs.MotionMagic.MotionMagicCruiseVelocity = 1;
-        driveConfigs.MotionMagic.MotionMagicAcceleration = 0.5;
+        driveConfigs.MotionMagic.MotionMagicCruiseVelocity = 10;
+        driveConfigs.MotionMagic.MotionMagicAcceleration = 10;
 
   
       return driveConfigs;

@@ -2,7 +2,9 @@ package com.uni.frc.subsystems;
 
 
 
- import org.littletonrobotics.junction.Logger;
+ import java.lang.annotation.Retention;
+
+import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
  import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -16,8 +18,7 @@ import edu.wpi.first.wpilibj.Timer;
  public class Indexer extends Subsystem {
 
    private PeriodicIO mPeriodicIO = new PeriodicIO();
-   private TalonFX indexerMotor = new TalonFX(Ports.Indexer, "Minivore");
-   private boolean lastBeam = false;
+   private TalonFX indexerMotor = new TalonFX(Ports.Indexer);
    private BeamBreak indexerBeamBreak;
    private TalonFXConfiguration indexerConfig;
 
@@ -38,9 +39,8 @@ import edu.wpi.first.wpilibj.Timer;
    }
    public enum State{
     OFF(0),
-    RECIEVING(-.25),
+    RECIEVING(-.2),
     TRANSFERING(-1),
-    REVERSE_TRANSFER(-.5), 
     OUTTAKING(0.4);
 
     double output = 0;
@@ -153,7 +153,7 @@ import edu.wpi.first.wpilibj.Timer;
       @Override
       public boolean isFinished() {
         // return false;
-        return (Timer.getFPGATimestamp() - startTime > timeout && hasPiece()) || Timer.getFPGATimestamp() - startTime > timeout+2;
+        return hasPiece() || Timer.getFPGATimestamp() - startTime > timeout;
       }
     };
   }
@@ -215,9 +215,7 @@ import edu.wpi.first.wpilibj.Timer;
      mPeriodicIO.velocity = indexerMotor.getVelocity().getValueAsDouble();
      mPeriodicIO.statorCurrent = indexerMotor.getStatorCurrent().getValueAsDouble();
 
-    if(lastBeam != indexerBeamBreak.get()&& lastBeam==true)
-      mPeriodicIO.hasPiece = !mPeriodicIO.hasPiece;
-    lastBeam = indexerBeamBreak.get();
+      mPeriodicIO.hasPiece = indexerBeamBreak.get();
   }
 
    @Override

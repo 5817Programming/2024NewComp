@@ -12,8 +12,8 @@ import com.uni.lib.TalonConfigs;
 
  public class Shooter extends Subsystem {
    private PeriodicIO mPeriodicIO = new PeriodicIO();
-   private TalonFX shooterMotor1 = new TalonFX(Ports.shooter1, "Minivore");
-   private TalonFX shooterMotor2 = new TalonFX(Ports.shooter2, "Minivore");
+   private TalonFX shooterMotor1 = new TalonFX(Ports.shooter1);
+   private TalonFX shooterMotor2 = new TalonFX(Ports.shooter2);
    public State currentState = State.IDLE;
    private TalonFXConfiguration shooterConfig = new TalonFXConfiguration();
    private double spinMultiplier = 1;
@@ -55,6 +55,8 @@ import com.uni.lib.TalonConfigs;
    }
 
    public void configMotors() {
+    shooterMotor1.setInverted(true);
+    shooterMotor2.setInverted(true);
      shooterConfig = TalonConfigs.shooterConfigs();
      shooterMotor1.getConfigurator().apply(shooterConfig);
      shooterMotor2.getConfigurator().apply(shooterConfig);

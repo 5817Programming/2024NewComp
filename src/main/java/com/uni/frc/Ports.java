@@ -38,7 +38,6 @@ public static final int FRONT_RIGHT_ROTATION = 5;
         public static final int shooter1 = 18;
         public static final int shooter2 = 26;
         public static final int Pivot1 = 13;
-        public static final int Pivot2 = 14;
 
         public static final int Indexer = 19; 
         public static final int IndexerBeamBreakPort = 0;
