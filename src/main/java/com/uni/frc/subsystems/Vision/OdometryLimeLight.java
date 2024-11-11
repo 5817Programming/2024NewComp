@@ -112,15 +112,21 @@ public class OdometryLimeLight extends Subsystem {
     Pose2d mt2 = new Pose2d(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-up").pose);
 
     Pose2d mt = new Pose2d(LimelightHelpers.getBotPose2d_wpiBlue("limelight-up"));
-    
 
     int tagId = mPeriodicIO.tagId;
     if (mPeriodicIO.seesTarget) {
+      Logger.recordOutput("mt1", mt.toWPI());
+      Logger.recordOutput("mt2", mt2.toWPI());
           Logger.recordOutput("SizeOfAvg", movingAverage.getSize());
           if(movingAverage.getSize()==999)
             System.out.println("Ready");
-          movingAverage.addNumber(mt.getRotation().flip().getDegrees());
-      if (mt2 != Pose2d.identity() && mPeriodicIO.useVision) {
+          double degrees = mt.getRotation().flip().getDegrees();
+          if(degrees < 0){
+            degrees = degrees + 360;
+          }
+          movingAverage.addNumber(degrees);
+          Logger.recordOutput("average input",mt.getRotation().flip().getDegrees());
+      if ((!mt2.equals( Pose2d.identity())) && mPeriodicIO.useVision) {
         mPeriodicIO.visionUpdate = Optional 
             .of(new VisionUpdate(timestamp - mPeriodicIO.latency, mt2));
         RobotState.getInstance().addVisionUpdate(

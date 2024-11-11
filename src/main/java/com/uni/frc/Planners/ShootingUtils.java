@@ -83,18 +83,24 @@ public class ShootingUtils {
 
         
         double compensatedPivotAngle;
-        if(manual)
-            compensatedPivotAngle = 55;
+;
+        if(manual){
+            compensatedPivotAngle = 21+pivotOffset;
+        }
         else{
             compensatedPivotAngle = pivotAngleTreeMap.getInterpolated(new InterpolatingDouble(compensatedDistance)).value+pivotOffset;
-       }
+        }
        Logger.recordOutput("compensatedDistance", compensatedDistance);
         double desiredPivotAngle = pivotAngleTreeMap.getInterpolated(new InterpolatingDouble(effectiveDistance)).value;
         double uncompensatedDesiredShooterSpeed = velocityTreeMap.getInterpolated(new InterpolatingDouble(effectiveDistance)).value;
-        double compensatedDesiredShooterSpeed = velocityTreeMap.getInterpolated(new InterpolatingDouble(compensatedDistance)).value;
         double compensatedSpin = ShooterConstants.SPIN_TREE_MAP.getInterpolated(new InterpolatingDouble(compensatedDistance)).value;
+        double compensatedDesiredShooterSpeed = velocityTreeMap.getInterpolated(new InterpolatingDouble(compensatedDistance)).value;
+
         if(compensatedPivotAngle>36){
             compensatedPivotAngle = 36;
+        }
+        else if(compensatedPivotAngle<1){
+            compensatedPivotAngle = 1;
         }
         return new ShootingParameters(
             effectiveDistance, 

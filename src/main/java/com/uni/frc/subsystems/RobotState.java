@@ -170,6 +170,7 @@ public class RobotState {
             if (!mPoseAcceptor.shouldAcceptVision(mLatestVisionUpdate.get().getTimestamp(), visionFieldToVehicle, MeasuredVelocity)) {
                 return;
             }
+            
 
                 var visionOdomError = visionFieldToVehicle.getTranslation().translateBy(odomToVehicle.getTranslation().inverse());
                 mDisplayVisionPose = visionFieldToVehicle;

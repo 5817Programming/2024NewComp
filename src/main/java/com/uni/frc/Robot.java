@@ -15,6 +15,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import com.uni.frc.Autos.AutoBase;
 import com.uni.frc.Autos.AutoExecuter;
 import com.uni.frc.Autos.Modes.M6;
+import com.uni.frc.Autos.Modes.Shoot;
 import com.uni.frc.Controls.Controls;
 import com.uni.frc.loops.Looper;
 import com.uni.frc.subsystems.Arm;
@@ -57,9 +58,10 @@ public class Robot extends LoggedRobot {
   HashMap<String,AutoBase> autos = new HashMap<String,AutoBase>();
     @Override
     public void robotInit() {
-      autos.put("Middle 6", new M6());
+      DriverStation.silenceJoystickConnectionWarning(true);
+      autos.put("Middle 4", new M6());
   
-      // autos.put("1", new Shoot());
+      autos.put("1", new Shoot());
   
       DriverStation.startDataLog(DataLogManager.getLog());
   
@@ -107,13 +109,14 @@ public class Robot extends LoggedRobot {
     }
   
   
-  
+boolean disableGyroReset = false;
     @Override
     public void autonomousInit() {
+      disableGyroReset = true;
       swerve = SwerveDrive.getInstance();
       swerve.zeroModules();
       SuperStructure.getInstance().setState(SuperState.AUTO);
-      autoExecuter.setAuto(new M6());
+      autoExecuter.setAuto(auto);
       autoExecuter.start();
     }
   
@@ -125,6 +128,7 @@ public class Robot extends LoggedRobot {
     /** This function is called once when teleop is enabled. */  
     @Override
     public void teleopInit() {
+      
       swerve = SwerveDrive.getInstance();
       // swerve.fieldzeroSwerve();
       swerve.zeroModules();
@@ -151,7 +155,9 @@ public class Robot extends LoggedRobot {
     @Override
     public void disabledPeriodic() {
       RobotState.getInstance().outputTelemetry();
-      swerve.resetGryo(OdometryLimeLight.getInstance().getMovingAverageHeading());
+      if(!disableGyroReset)
+        swerve.resetGryo(OdometryLimeLight.getInstance().getMovingAverageHeading());
+        Logger.recordOutput("reset angle", OdometryLimeLight.getInstance().getMovingAverageHeading());
     }
   
     /** This function is called once when test mode is enabled. */

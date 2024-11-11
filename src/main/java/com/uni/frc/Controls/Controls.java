@@ -45,17 +45,18 @@ public class Controls {
         s.setPieceAim(Driver.BButton.isActive());
 
         if(Driver.DpadUp.isPressed())
-            s.offsetPivot(.25);
+            s.offsetPivot(1);
         if(Driver.DpadDown.isPressed())
-            s.offsetPivot(-.25);
-
+            s.offsetPivot(-1);
+        
+        s.setManual(true);
+        
         // if(Driver.RightBumper.isActive()){
         //     s.intakePercent(-percent);
         // }
         // else{
         //     s.intakePercent(0);
         // }
-        s.setManual(CoDriver.BButton.isActive());
         if(Driver.XButton.isPressed())
             amp = true;
         if(Driver.BButton.isPressed())
@@ -70,7 +71,6 @@ public class Controls {
             Climb.getInstance().conformToState(Climb.State.Down);
         // else if(Driver.BButton.isPressed()){
         //     s.onTheFlyTrajectoryState(new Pose2d(8,2, Rotation2d.fromDegrees(180)), timestamp);
-
         if(Driver.LeftBumper.isActive())
             if(amp)
                 s.setMode(Mode.AMPOVERIDE);
@@ -93,7 +93,7 @@ public class Controls {
         else{
             s.setState(SuperState.IDLE);
         }
-        swerve.sendInput(-Driver.LeftStickY.getValue(), Driver.LeftStickX.getValue(), Driver.RightStickX.getValue());
+        swerve.sendInput(-Driver.LeftStickY.getValue()*0.8, Driver.LeftStickX.getValue()*0.8, Driver.RightStickX.getValue());
     }}
 
 

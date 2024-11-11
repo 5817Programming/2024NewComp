@@ -227,19 +227,19 @@ public static final double kLooperDt = 0.02;
         public static final double TRAP = 0;
         public static final double TRANSFER = 0;
         public static final double SHOOTING = 0;
-        public static final double MAX_UP = 26.0;
+        public static final double MAX_UP = 36.0;
         public static final double MAX_DOWN = 0;
         public static final double INTAKING = 5;
 
         public 
         static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> SpeakerAngleMap = new InterpolatingTreeMap<>();
         static{
-            SpeakerAngleMap.put(new InterpolatingDouble(1.1), new InterpolatingDouble(26.5));
-            SpeakerAngleMap.put(new InterpolatingDouble(2.11), new InterpolatingDouble(18.5));
-            SpeakerAngleMap.put(new InterpolatingDouble(3.08), new InterpolatingDouble(10.65));
-            SpeakerAngleMap.put(new InterpolatingDouble(3.71), new InterpolatingDouble(6.35));
-            SpeakerAngleMap.put(new InterpolatingDouble(4.67), new InterpolatingDouble(2.5));
-            SpeakerAngleMap.put(new InterpolatingDouble(5.5), new InterpolatingDouble(0.0));
+            SpeakerAngleMap.put(new InterpolatingDouble(1.1), new InterpolatingDouble(36.0));
+            SpeakerAngleMap.put(new InterpolatingDouble(2.11), new InterpolatingDouble(27.5));
+            SpeakerAngleMap.put(new InterpolatingDouble(3.08), new InterpolatingDouble(18.65));
+            SpeakerAngleMap.put(new InterpolatingDouble(3.71), new InterpolatingDouble(14.35));
+            SpeakerAngleMap.put(new InterpolatingDouble(4.67), new InterpolatingDouble(7.5));
+            SpeakerAngleMap.put(new InterpolatingDouble(5.5), new InterpolatingDouble(5.0));
 
        }
         public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> LobAngleMap = new InterpolatingTreeMap<>();

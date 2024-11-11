@@ -3,6 +3,8 @@ package com.uni.frc.Autos.Modes;
 
 
 import com.uni.frc.Autos.AutoBase;
+import com.uni.frc.Autos.Actions.LambdaAction;
+import com.uni.frc.Autos.Actions.WaitAction;
 import com.uni.frc.subsystems.Shooter;
 import com.uni.frc.subsystems.SuperStructure;
 public class Shoot extends AutoBase{
@@ -11,9 +13,8 @@ public class Shoot extends AutoBase{
 
     @Override
     public void routine() {
-        Shooter.getInstance().setPercent(0.8);
-
-        s.setPivotState(0.083-.125);
-        s.shootState(false);
+        s.setContinuousShoot(true);
+        runAction(new WaitAction(2));
+        runAction(new LambdaAction(() -> s.shootState(false)));
     }
 }

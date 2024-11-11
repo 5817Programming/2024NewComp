@@ -56,6 +56,8 @@ public class TalonConfigs {
         driveConfigs.Slot0.kG = -.23;
         driveConfigs.Feedback.FeedbackRemoteSensorID = Ports.PivotEncoder;
         driveConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+
+        
         
 
         driveConfigs.OpenLoopRamps.DutyCycleOpenLoopRampPeriod =.5; 

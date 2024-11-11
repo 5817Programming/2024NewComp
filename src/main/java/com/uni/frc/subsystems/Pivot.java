@@ -18,7 +18,6 @@ import com.uni.frc.subsystems.Requests.Request;
 import com.uni.lib.LoggedTunableNumber;
 import com.uni.lib.TalonConfigs;
 
-import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
 public class Pivot extends Subsystem {
   private PeriodicIOAutoLogged mPeriodicIO = new PeriodicIOAutoLogged();
@@ -40,7 +39,7 @@ public class Pivot extends Subsystem {
   /** Creates a new pivot. */
   public Pivot() {
     configMotors();
-    resetToAbsolute();
+    encoder.setPosition(0);
   }
 
   public enum ControlMode {
@@ -61,13 +60,6 @@ public class Pivot extends Subsystem {
     State(double output) {
       this.output = output;
     }
-  }
-
-  public void resetToAbsolute() {
-    double currentAngle = getAbsolutePosition() / 360;
-    pivotMotor1.setPosition(currentAngle);
-
-    mPeriodicIO.rotationDemand = currentAngle;
   }
 
   public void setRamp(double rampTime) {

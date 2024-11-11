@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.lang.model.util.ElementScanner14;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.uni.frc.Constants;
@@ -202,7 +205,11 @@ public class SuperStructure extends Subsystem {
                     case SHOOTING:
                         prepareShooterSetpoints(timestamp, manual);
                         mDrive.setLob(!inShootZone(timestamp));
-                        mDrive.setState(SwerveDrive.State.AIMING);
+                        if(!manual)
+                            mDrive.setState(SwerveDrive.State.AIMING);
+                        else
+                            mDrive.setState(SwerveDrive.State.MANUAL);
+
                         if (stateChanged)
                             indicationState();
                         break;
