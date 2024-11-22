@@ -150,10 +150,10 @@ public class Arm extends Subsystem {
   public void readPeriodicInputs() {
     switch (mPeriodicIO.rotationControlMode) {
       case MotionMagic:
-        motionMagic();
+        // motionMagic();
         break;
       case Percent:
-        setPercent();
+        // setPercent();
         break;
     }
   }

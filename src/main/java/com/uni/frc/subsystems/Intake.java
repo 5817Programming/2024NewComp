@@ -110,7 +110,7 @@
 
     @Override
     public void readPeriodicInputs() {
-      intakeMotor.setControl(new DutyCycleOut(mPeriodicIO.driveDemand, true, false, false, false));
+      // intakeMotor.setControl(new DutyCycleOut(mPeriodicIO.driveDemand, true, false, false, false));
     }
 
     @Override

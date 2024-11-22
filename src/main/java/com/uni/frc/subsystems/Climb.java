@@ -160,7 +160,7 @@ import com.uni.frc.Constants.ElevatorConstants;
 
     @Override
     public void readPeriodicInputs() {
-      motionMagic();
+      // motionMagic();
     }
 
     @Override

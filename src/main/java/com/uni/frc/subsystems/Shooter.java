@@ -152,8 +152,8 @@ import com.uni.lib.TalonConfigs;
 
    @Override
    public void readPeriodicInputs() {
-      shooterMotor1.setControl(new DutyCycleOut(mPeriodicIO.driveDemand).withEnableFOC(true));
-      shooterMotor2.setControl(new DutyCycleOut(-mPeriodicIO.driveDemand*(spinMultiplier)).withEnableFOC(true));
+      // shooterMotor1.setControl(new DutyCycleOut(mPeriodicIO.driveDemand).withEnableFOC(true));
+      // shooterMotor2.setControl(new DutyCycleOut(-mPeriodicIO.driveDemand*(spinMultiplier)).withEnableFOC(true));
     }
 
    @Override

@@ -93,7 +93,7 @@ public class Controls {
         else{
             s.setState(SuperState.IDLE);
         }
-        swerve.sendInput(-Driver.LeftStickY.getValue()*0.8, Driver.LeftStickX.getValue()*0.8, Driver.RightStickX.getValue());
+        swerve.sendInput(-Driver.LeftStickY.getValue(), Driver.LeftStickX.getValue(), Driver.RightStickX.getValue());
     }}
 
 

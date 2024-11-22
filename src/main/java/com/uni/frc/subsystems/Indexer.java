@@ -220,7 +220,7 @@ import edu.wpi.first.wpilibj.Timer;
 
    @Override
    public void readPeriodicInputs() {
-     indexerMotor.setControl(new DutyCycleOut(mPeriodicIO.driveDemand, true, false, false, false));
+    //  indexerMotor.setControl(new DutyCycleOut(mPeriodicIO.driveDemand, true, false, false, false));
    }
 
    @Override
